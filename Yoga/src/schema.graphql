@@ -1,0 +1,26 @@
+# import * from "../src/generated/prisma.graphql"
+
+type Mutation {
+  createUser(userName: String!, password: String!): User!
+  createBoard(name: String!, description: String!): Board!
+}
+type Query {
+  users: [User]!
+  boards(
+    where: BoardWhereInput
+    orderBy: BoardOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Board]!
+  board(where: BoardWhereUniqueInput!): Board
+  boardsConnection(where: BoardWhereInput): BoardConnection!
+}
+
+# type BoardConnection {
+#   pageInfo: PageInfo!
+#   edges: [BoardEdge]!
+#   aggregate: AggregateBoard
+# }

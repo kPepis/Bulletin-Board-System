@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "PrismaBBS": {
+      "schemaPath": "generated/prisma.graphql",
+      "extensions": {
+        "endpoints": {
+          "PrismaDev": "http://localhost:4466/"
+        },
+        "prepare-binding": {
+          "output": "generated/prisma.ts",
+          "generator": "prisma-ts"
+        }
+      }
+    }
+  }
+}

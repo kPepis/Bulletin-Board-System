@@ -1,0 +1,31 @@
+{
+  "name": "with-typescript",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@zeit/next-typescript": "^1.1.1",
+    "apollo-client": "^2.4.7",
+    "next": "7.0.2",
+    "prisma": "^1.22.2",
+    "react": "16.6.3",
+    "react-dom": "16.6.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/next": "^7.0.1",
+    "@types/react": "^16.4.16",
+    "@types/react-dom": "16.0.11",
+    "graphql": "latest",
+    "graphql-tag": "latest",
+    "isomorphic-fetch": "latest",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "3.2.2"
+  },
+  "license": "ISC"
+}

@@ -1,0 +1,9 @@
+.next
+.vscode
+.idea
+.git
+.results
+scripts
+*Dockerfile*
+node_modules
+package-lock.json

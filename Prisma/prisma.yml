@@ -1,0 +1,24 @@
+endpoint: ${env:PRISMA_ENDPOINT}
+datamodel: datamodel.prisma
+# secret: ${env:PRISMA_SECRET}
+databaseType: document
+
+generate:
+  # Prisma generators
+  - generator: typescript-client
+    output: ./generated/prisma-client/
+  - generator: javascript-client
+    output: ./generated/prisma-client/
+  - generator: graphql-schema
+    output: ./generated/
+
+  # Yoga generators
+  - generator: typescript-client
+    output: ../Yoga/src/generated/prisma-client
+  - generator: graphql-schema
+    output: ../Yoga/src/generated/
+
+hooks:
+  post-deploy:
+    - prisma generate
+    # - graphql prepare --verbose
