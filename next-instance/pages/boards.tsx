@@ -1,15 +1,14 @@
-import { Pagination } from "antd";
+import { Card, Pagination } from "antd";
 import gql from "graphql-tag";
 import { NextContext } from "next";
 import Router from "next/router";
 import React, { Component } from "react";
 import { Query } from "react-apollo";
-import { PacmanLoader } from "react-spinners";
 
+import * as PrismaTypes from "../../Prisma/generated/prisma-client/index";
 import Board, { BoardProps } from "../components/Board/Board";
 import BoardsForm from "../components/BoardsForm/BoardsForm";
 import { perPage } from "../config";
-import * as PrismaTypes from "../../Prisma/generated/prisma-client/index";
 
 interface PaginationData {
   boardsConnection: {
@@ -72,16 +71,18 @@ export default class Boards extends Component<BoardsProps> {
 
     return (
       <>
-        <p>List of boards:</p>
         <Query query={GET_ALL_BOARDS} variables={boardsToShowConfig}>
           {({ data, error, loading }) => {
-            if (loading)
-              return <PacmanLoader loading={loading} color={"black"} />;
+            if (loading) {
+              return <Card loading={loading} />;
+            }
             if (error) return <p>Error loading boards: {error.message}</p>;
             return (
               <>
                 {data.boards.map((board: BoardProps) => (
-                  <Board {...board} key={board.id} />
+                  <Card hoverable={true}>
+                    <Board {...board} key={board.id} />
+                  </Card>
                 ))}
               </>
             );
@@ -91,23 +92,19 @@ export default class Boards extends Component<BoardsProps> {
         <Query query={PAGINATION_QUERY}>
           {queryResult => {
             const data: PaginationData = queryResult.data;
-            console.log(queryResult);
-            const count =
+            const numOfBoards =
               data.boardsConnection === undefined
                 ? 0
                 : data.boardsConnection.aggregate.count;
 
-            const { error, loading } = queryResult;
-            if (loading)
-              return <PacmanLoader loading={loading} color={"black"} />;
+            const { error } = queryResult;
             if (error) return <p>Error loading boards: {error.message}</p>;
             return (
               <>
-                <p>There are {count} boards</p>
-                {/* Total is the number of items, not pages */}
+                <p>There are {numOfBoards} boards</p>
                 <Pagination
                   showSizeChanger
-                  total={count}
+                  total={numOfBoards}
                   defaultPageSize={perPage}
                   current={this.props.page}
                   onChange={this.onPageChange}

@@ -36,7 +36,6 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      # - "mongo:/var/lib/mongo"
       - "./MongoData:/data/db"
   yoga:
     image: "bbs/yoga:latest"

@@ -8,6 +8,14 @@
         "style": true
       }
     ],
-    "emotion"
+    "emotion",
+    [
+      "styled-components",
+      {
+        "ssr": true,
+        "displayName": true,
+        "preprocess": true
+      }
+    ]
   ]
 }

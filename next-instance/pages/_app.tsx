@@ -1,9 +1,12 @@
+import { Icon, Layout, Menu } from "antd";
 import { ApolloClient } from "apollo-boost";
 import App, { Container, NextAppContext } from "next/app";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
 
 import withData from "../lib/withData";
+
+const { Sider, Content } = Layout;
 
 interface IProps {
   apollo: ApolloClient<any>;
@@ -34,7 +37,25 @@ class MyApp extends App<IProps> {
     return (
       <Container>
         <ApolloProvider client={apollo}>
-          <Component {...pageProps} />
+          <Layout hasSider={true}>
+            <Sider collapsible collapsedWidth={50} theme="dark">
+              <div className="logo" />
+              <Menu theme="dark" mode="inline">
+                <Menu.Item>
+                  <Icon type="user" />
+                  <span>My profile</span>
+                </Menu.Item>
+                
+                <Menu.Item>Boards</Menu.Item>
+              </Menu>
+            </Sider>
+
+            <Layout>
+              <Content>
+                <Component {...pageProps} />
+              </Content>
+            </Layout>
+          </Layout>
         </ApolloProvider>
       </Container>
     );

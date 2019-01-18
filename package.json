@@ -8,6 +8,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.6",
     "@zeit/next-typescript": "^1.1.1",
     "apollo-client": "^2.4.7",
     "next": "7.0.2",
@@ -20,6 +21,7 @@
     "@types/next": "^7.0.1",
     "@types/react": "^16.4.16",
     "@types/react-dom": "16.0.11",
+    "@types/styled-components": "^4.1.6",
     "graphql": "latest",
     "graphql-tag": "latest",
     "isomorphic-fetch": "latest",
