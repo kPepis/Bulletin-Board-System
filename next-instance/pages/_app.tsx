@@ -3,7 +3,7 @@ import { ApolloClient } from "apollo-boost";
 import App, { Container, NextAppContext } from "next/app";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
-
+import Link from "next/link";
 import withData from "../lib/withData";
 
 const { Sider, Content } = Layout;
@@ -45,8 +45,19 @@ class MyApp extends App<IProps> {
                   <Icon type="user" />
                   <span>My profile</span>
                 </Menu.Item>
+
+                <Menu.Item>
+                  <Link href="/">
+                    <a>Registration</a>
+                  </Link>
+                </Menu.Item>
+
+                <Menu.Item>
+                  <Link href="/boards">
+                    <a>Boards</a>
+                  </Link>
+                </Menu.Item>
                 
-                <Menu.Item>Boards</Menu.Item>
               </Menu>
             </Sider>
 

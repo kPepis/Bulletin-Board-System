@@ -71,7 +71,11 @@ export default class Boards extends Component<BoardsProps> {
 
     return (
       <>
-        <Query query={GET_ALL_BOARDS} variables={boardsToShowConfig}>
+        <Query
+          query={GET_ALL_BOARDS}
+          variables={boardsToShowConfig}
+          fetchPolicy="network-only"
+        >
           {({ data, error, loading }) => {
             if (loading) {
               return <Card loading={loading} />;
@@ -89,13 +93,18 @@ export default class Boards extends Component<BoardsProps> {
           }}
         </Query>
 
-        <Query query={PAGINATION_QUERY}>
+        <Query query={PAGINATION_QUERY} fetchPolicy="network-only">
           {queryResult => {
             const data: PaginationData = queryResult.data;
-            const numOfBoards =
-              data.boardsConnection === undefined
-                ? 0
-                : data.boardsConnection.aggregate.count;
+            let numOfBoards = 0;
+            try {
+              numOfBoards =
+                data.boardsConnection === undefined
+                  ? 0
+                  : data.boardsConnection.aggregate.count;
+            } catch {
+              return <p>Error loading boards</p>;
+            }
 
             const { error } = queryResult;
             if (error) return <p>Error loading boards: {error.message}</p>;

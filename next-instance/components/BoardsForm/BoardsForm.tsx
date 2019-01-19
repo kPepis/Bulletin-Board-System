@@ -6,6 +6,7 @@ import { FormComponentProps } from "antd/lib/form";
 import gql from "graphql-tag";
 import React, { Component } from "react";
 import { Mutation } from "react-apollo";
+import Router from "next/router";
 
 const CREATE_BOARD_MUTATION = gql`
   mutation CREATE_BOARD_MUTATION($name: String!, $description: String!) {
@@ -75,7 +76,6 @@ class NormalLoginForm extends Component<FormComponentProps> {
                     this.props.form.validateFields(
                       async (err, values: NewBoardFormValues) => {
                         if (!err) {
-                          console.log(values);
                           await createBoard();
                         }
                       },
