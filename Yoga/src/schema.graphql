@@ -3,9 +3,12 @@
 type Mutation {
   createUser(userName: String!, password: String!): User!
   createBoard(name: String!, description: String!): Board!
+  createPost(title: String!, content: String!, boardName: String!): Post!
 }
+
 type Query {
   users: [User]!
+
   boards(
     where: BoardWhereInput
     orderBy: BoardOrderByInput
@@ -17,6 +20,8 @@ type Query {
   ): [Board]!
   board(where: BoardWhereUniqueInput!): Board
   boardsConnection(where: BoardWhereInput): BoardConnection!
+
+  posts: [Post]!
 }
 
 # type BoardConnection {

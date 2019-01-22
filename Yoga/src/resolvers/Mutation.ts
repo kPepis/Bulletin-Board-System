@@ -22,7 +22,27 @@ const Mutation = {
     info: GraphQLResolveInfo,
   ) {
     // todo check if user is logged in
-    return await ctx.db.createBoard({ ...args });
+    return await ctx.db.createBoard({
+      ...args,
+    });
+  },
+
+  async createPost(
+    parent: any,
+    args: any,
+    ctx: Context,
+    info: GraphQLResolveInfo,
+  ) {
+    console.log(args);
+    return await ctx.db.createPost({
+      board: {
+        connect: {
+          name: args.boardName,
+        },
+      },
+      // board: { connect: { id: args.boardId } },
+      ...args,
+    });
   },
 };
 

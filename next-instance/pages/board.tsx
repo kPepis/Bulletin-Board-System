@@ -1,9 +1,12 @@
+import { Card } from "antd";
 import gql from "graphql-tag";
 import { NextContext } from "next";
+import Head from "next/head";
 import React, { Component } from "react";
 import { Query } from "react-apollo";
 import { PacmanLoader } from "react-spinners";
-import Head from "next/head";
+
+import Post, { PostProps } from "../components/Post";
 
 interface SingleBoardProps {
   query: {
@@ -13,10 +16,19 @@ interface SingleBoardProps {
 
 const SINGLE_BOARD_QUERY = gql`
   query SINGLE_BOARD_QUERY($id: ID!) {
-    board(where: { id: $id }) {
+    boards(where: { id: $id }) {
       id
       name
       description
+      posts {
+        id
+        title
+        content
+        board {
+          id
+          name
+        }
+      }
     }
   }
 `;
@@ -32,16 +44,31 @@ export default class Board extends Component<SingleBoardProps> {
     return (
       <Query query={SINGLE_BOARD_QUERY} variables={{ id }}>
         {({ error, loading, data }) => {
-          if (error) return <p>Error loading board with id: {id}</p>;
+          if (error)
+            return (
+              <p>
+                Error loading board with id: {id}. {error.toString()}
+              </p>
+            );
           if (loading)
             return <PacmanLoader loading={loading} color={"black"} />;
+          else {
+            console.log(data.board);
+          }
 
           return (
             <>
               <Head>
                 <title>{data.board.name}</title>
               </Head>
-              <p>This is the page for board {data.board.name}</p>
+
+              {data.board.posts !== null
+                ? data.board.posts.map((post: PostProps) => (
+                    <Card hoverable>
+                      <Post {...post} key={post.id} />
+                    </Card>
+                  ))
+                : "There are currently no posts in this board."}
             </>
           );
         }}

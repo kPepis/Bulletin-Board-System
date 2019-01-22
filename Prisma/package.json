@@ -1,10 +1,12 @@
 {
-  "name": "Prisma",
+  "name": "prisma",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "prisma deploy -e ../.env"
+    "deploy": "prisma deploy -e ../.env",
+    "delete": "prisma delete -e ../.env",
+    "reset": "prisma reset -e ../.env"
   },
   "keywords": [],
   "author": "",

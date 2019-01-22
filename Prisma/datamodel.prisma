@@ -1,23 +1,26 @@
 type User {
-  id: ID! @id
+  id: ID! @id @unique
   userName: String! @unique
   password: String!
   # posts: [Post]! @relation(link: INLINE)
   # boards: [Board]! @relation(link: INLINE)
 }
 
-type Post {
-  id: ID! @id
-  # author: User!
-  title: String!
-  content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type Board {
-  id: ID! @id
+  id: ID! @id @unique
   name: String! @unique
   description: String!
+  posts: [Post!]! @relation(link: INLINE)
   # createdBy: User!
+}
+
+type Post {
+  id: ID! @id @unique
+  # author: User! @relation(link: INLINE)
+  title: String!
+  content: String!
+  # board: Board! @relation(link: INLINE)
+  board: Board!
+  # createdAt: DateTime!
+  # updatedAt: DateTime!
 }

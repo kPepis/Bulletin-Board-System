@@ -6,8 +6,8 @@ import React, { Component } from "react";
 import { Query } from "react-apollo";
 
 import * as PrismaTypes from "../../Prisma/generated/prisma-client/index";
-import Board, { BoardProps } from "../components/Board/Board";
-import BoardsForm from "../components/BoardsForm/BoardsForm";
+import Board, { BoardProps } from "../components/Board";
+import BoardsForm from "../components/BoardsForm";
 import { perPage } from "../config";
 
 interface PaginationData {
@@ -38,6 +38,9 @@ const GET_ALL_BOARDS = gql`
       id
       name
       description
+      posts {
+        id
+      }
     }
   }
 `;
@@ -84,8 +87,8 @@ export default class Boards extends Component<BoardsProps> {
             return (
               <>
                 {data.boards.map((board: BoardProps) => (
-                  <Card hoverable={true}>
-                    <Board {...board} key={board.id} />
+                  <Card hoverable={true} key={board.id}>
+                    <Board {...board} />
                   </Card>
                 ))}
               </>

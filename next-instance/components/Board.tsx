@@ -15,6 +15,7 @@ export interface BoardProps {
   id: string;
   name: string;
   description: string;
+  posts: string[];
 }
 
 class Board extends Component<BoardProps> {

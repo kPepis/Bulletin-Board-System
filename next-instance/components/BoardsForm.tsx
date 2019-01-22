@@ -1,12 +1,9 @@
-import "./BoardsForm.css";
-
 import { Button, Col, Form, Icon, Input, Row } from "antd";
 import { ColProps } from "antd/lib/col";
 import { FormComponentProps } from "antd/lib/form";
 import gql from "graphql-tag";
 import React, { Component } from "react";
 import { Mutation } from "react-apollo";
-import Router from "next/router";
 
 const CREATE_BOARD_MUTATION = gql`
   mutation CREATE_BOARD_MUTATION($name: String!, $description: String!) {

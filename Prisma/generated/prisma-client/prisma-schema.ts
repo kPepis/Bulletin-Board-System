@@ -18,6 +18,7 @@ type Board {
   id: ID!
   name: String!
   description: String!
+  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
 }
 
 type BoardConnection {
@@ -27,6 +28,17 @@ type BoardConnection {
 }
 
 input BoardCreateInput {
+  name: String!
+  description: String!
+  posts: PostCreateManyWithoutBoardInput
+}
+
+input BoardCreateOneWithoutPostsInput {
+  create: BoardCreateWithoutPostsInput
+  connect: BoardWhereUniqueInput
+}
+
+input BoardCreateWithoutPostsInput {
   name: String!
   description: String!
 }
@@ -72,11 +84,29 @@ input BoardSubscriptionWhereInput {
 input BoardUpdateInput {
   name: String
   description: String
+  posts: PostUpdateManyWithoutBoardInput
 }
 
 input BoardUpdateManyMutationInput {
   name: String
   description: String
+}
+
+input BoardUpdateOneRequiredWithoutPostsInput {
+  create: BoardCreateWithoutPostsInput
+  update: BoardUpdateWithoutPostsDataInput
+  upsert: BoardUpsertWithoutPostsInput
+  connect: BoardWhereUniqueInput
+}
+
+input BoardUpdateWithoutPostsDataInput {
+  name: String
+  description: String
+}
+
+input BoardUpsertWithoutPostsInput {
+  update: BoardUpdateWithoutPostsDataInput!
+  create: BoardCreateWithoutPostsInput!
 }
 
 input BoardWhereInput {
@@ -132,8 +162,6 @@ input BoardWhereUniqueInput {
   name: String
 }
 
-scalar DateTime
-
 scalar Long
 
 type Mutation {
@@ -178,8 +206,7 @@ type Post {
   id: ID!
   title: String!
   content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  board: Board!
 }
 
 type PostConnection {
@@ -191,8 +218,17 @@ type PostConnection {
 input PostCreateInput {
   title: String!
   content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  board: BoardCreateOneWithoutPostsInput!
+}
+
+input PostCreateManyWithoutBoardInput {
+  create: [PostCreateWithoutBoardInput!]
+  connect: [PostWhereUniqueInput!]
+}
+
+input PostCreateWithoutBoardInput {
+  title: String!
+  content: String!
 }
 
 type PostEdge {
@@ -207,18 +243,60 @@ enum PostOrderByInput {
   title_DESC
   content_ASC
   content_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
 }
 
 type PostPreviousValues {
   id: ID!
   title: String!
   content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+}
+
+input PostScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  content: String
+  content_not: String
+  content_in: [String!]
+  content_not_in: [String!]
+  content_lt: String
+  content_lte: String
+  content_gt: String
+  content_gte: String
+  content_contains: String
+  content_not_contains: String
+  content_starts_with: String
+  content_not_starts_with: String
+  content_ends_with: String
+  content_not_ends_with: String
+  AND: [PostScalarWhereInput!]
+  OR: [PostScalarWhereInput!]
+  NOT: [PostScalarWhereInput!]
 }
 
 type PostSubscriptionPayload {
@@ -242,15 +320,49 @@ input PostSubscriptionWhereInput {
 input PostUpdateInput {
   title: String
   content: String
-  createdAt: DateTime
-  updatedAt: DateTime
+  board: BoardUpdateOneRequiredWithoutPostsInput
+}
+
+input PostUpdateManyDataInput {
+  title: String
+  content: String
 }
 
 input PostUpdateManyMutationInput {
   title: String
   content: String
-  createdAt: DateTime
-  updatedAt: DateTime
+}
+
+input PostUpdateManyWithoutBoardInput {
+  create: [PostCreateWithoutBoardInput!]
+  delete: [PostWhereUniqueInput!]
+  connect: [PostWhereUniqueInput!]
+  disconnect: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutBoardInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutBoardInput!]
+  deleteMany: [PostScalarWhereInput!]
+  updateMany: [PostUpdateManyWithWhereNestedInput!]
+}
+
+input PostUpdateManyWithWhereNestedInput {
+  where: PostScalarWhereInput!
+  data: PostUpdateManyDataInput!
+}
+
+input PostUpdateWithoutBoardDataInput {
+  title: String
+  content: String
+}
+
+input PostUpdateWithWhereUniqueWithoutBoardInput {
+  where: PostWhereUniqueInput!
+  data: PostUpdateWithoutBoardDataInput!
+}
+
+input PostUpsertWithWhereUniqueWithoutBoardInput {
+  where: PostWhereUniqueInput!
+  update: PostUpdateWithoutBoardDataInput!
+  create: PostCreateWithoutBoardInput!
 }
 
 input PostWhereInput {
@@ -296,22 +408,6 @@ input PostWhereInput {
   content_not_starts_with: String
   content_ends_with: String
   content_not_ends_with: String
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
   AND: [PostWhereInput!]
   OR: [PostWhereInput!]
   NOT: [PostWhereInput!]
