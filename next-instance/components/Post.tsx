@@ -1,4 +1,4 @@
-import { Card } from "antd";
+import { Avatar, Card, List } from "antd";
 import React, { Component } from "react";
 import { lightSpeedIn } from "react-animations";
 import styled, { keyframes } from "styled-components";

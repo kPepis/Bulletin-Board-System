@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
   prisma:
-    image: "prismagraphql/prisma:1.23.2"
+    image: "prismagraphql/prisma:1.26-beta-2"
     restart: always
     ports:
       - "4466:4466"

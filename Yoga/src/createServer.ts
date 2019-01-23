@@ -1,7 +1,7 @@
-import { GraphQLServer } from "graphql-yoga"
-import Mutation from "./resolvers/Mutation"
-import Query from "./resolvers/Query"
-import db from "./db"
+import { GraphQLServer } from "graphql-yoga";
+import Mutation from "./resolvers/Mutation";
+import Query from "./resolvers/Query";
+import db from "./db";
 // import { prisma as db } from "./generated/prisma-client";
 
 // Create the GraphQL Yoga server with the schema of the things we want to expose
@@ -11,6 +11,9 @@ export default function createServer(): GraphQLServer {
     resolvers: {
       Mutation,
       Query,
+      Board: {
+        posts: parent => db.board({ id: parent.id }).posts(),
+      },
     },
     resolverValidationOptions: {
       requireResolversForResolveType: false,
@@ -23,5 +26,5 @@ export default function createServer(): GraphQLServer {
         ...db,
       },
     }),
-  })
+  });
 }

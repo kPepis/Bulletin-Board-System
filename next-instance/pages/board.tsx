@@ -1,4 +1,4 @@
-import { Card } from "antd";
+import { Card, List, Avatar } from "antd";
 import gql from "graphql-tag";
 import { NextContext } from "next";
 import Head from "next/head";
@@ -16,7 +16,7 @@ interface SingleBoardProps {
 
 const SINGLE_BOARD_QUERY = gql`
   query SINGLE_BOARD_QUERY($id: ID!) {
-    boards(where: { id: $id }) {
+    board(where: { id: $id }) {
       id
       name
       description
@@ -24,10 +24,6 @@ const SINGLE_BOARD_QUERY = gql`
         id
         title
         content
-        board {
-          id
-          name
-        }
       }
     }
   }
@@ -52,9 +48,8 @@ export default class Board extends Component<SingleBoardProps> {
             );
           if (loading)
             return <PacmanLoader loading={loading} color={"black"} />;
-          else {
-            console.log(data.board);
-          }
+
+          const posts: PostProps = data.board.posts;
 
           return (
             <>
@@ -62,13 +57,32 @@ export default class Board extends Component<SingleBoardProps> {
                 <title>{data.board.name}</title>
               </Head>
 
-              {data.board.posts !== null
-                ? data.board.posts.map((post: PostProps) => (
-                    <Card hoverable>
-                      <Post {...post} key={post.id} />
-                    </Card>
-                  ))
-                : "There are currently no posts in this board."}
+              <List
+                itemLayout="vertical"
+                size="large"
+                dataSource={posts}
+                bordered={true}
+                renderItem={(post: PostProps) => (
+                  <List.Item
+                    key={post.id}
+                    extra={
+                      <img
+                        alt="user avatar"
+                        src={`https://robohash.org/${post.id}`}
+                        width={100}
+                      />
+                    }
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar src={`https://robohash.org/${post.id}`} />
+                      }
+                      title={post.title}
+                      description={post.content}
+                    />
+                  </List.Item>
+                )}
+              />
             </>
           );
         }}
