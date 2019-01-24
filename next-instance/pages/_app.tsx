@@ -1,9 +1,13 @@
+import "../lib/dummy.css";
+import "../lib/dummy.less";
+
 import { Icon, Layout, Menu } from "antd";
 import { ApolloClient } from "apollo-boost";
 import App, { Container, NextAppContext } from "next/app";
+import Link from "next/link";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
-import Link from "next/link";
+
 import withData from "../lib/withData";
 
 const { Sider, Content } = Layout;
@@ -15,12 +19,6 @@ interface IProps {
 class MyApp extends App<IProps> {
   static async getInitialProps(context: NextAppContext) {
     const { Component, ctx } = context;
-
-    // let pageProps = {};
-
-    // if (Component.getInitialProps) {
-    //   pageProps = await Component.getInitialProps(ctx)
-    // }
 
     const pageProps =
       typeof (Component as any).getInitialProps === "function"
@@ -57,7 +55,6 @@ class MyApp extends App<IProps> {
                     <a>Boards</a>
                   </Link>
                 </Menu.Item>
-                
               </Menu>
             </Sider>
 

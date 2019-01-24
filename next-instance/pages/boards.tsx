@@ -5,7 +5,7 @@ import Router from "next/router";
 import React, { Component } from "react";
 import { Query } from "react-apollo";
 
-import * as PrismaTypes from "../../Prisma/generated/prisma-client/index";
+import * as PrismaTypes from "../../Prisma/generated/prisma-client/";
 import Board, { BoardProps } from "../components/Board";
 import BoardsForm from "../components/BoardsForm";
 import { perPage } from "../config";
