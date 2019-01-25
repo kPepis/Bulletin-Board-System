@@ -14,6 +14,9 @@ export default function createServer(): GraphQLServer {
       Board: {
         posts: parent => db.board({ id: parent.id }).posts(),
       },
+      Post: {
+        board: parent => db.post({ id: parent.id }).board(),
+      },
     },
     resolverValidationOptions: {
       requireResolversForResolveType: false,
