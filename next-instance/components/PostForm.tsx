@@ -130,12 +130,6 @@ class PostForm extends Component<FormComponentProps> {
   }
 }
 
-const WrappedNormalLoginForm = Form.create({
-  mapPropsToFields(props) {
-    return {
-      isFormValid: Form.createFormField("das"),
-    };
-  },
-})(PostForm);
+const WrappedNormalLoginForm = Form.create()(PostForm);
 
 export default WrappedNormalLoginForm;

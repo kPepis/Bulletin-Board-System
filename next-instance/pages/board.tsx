@@ -4,7 +4,13 @@ import gql from "graphql-tag";
 import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
-import { Mutation, Query } from "react-apollo";
+import {
+  Mutation,
+  Query,
+  MutationResult,
+  MutationFn,
+  OperationVariables,
+} from "react-apollo";
 import { PacmanLoader } from "react-spinners";
 
 import Post, { PostProps } from "../components/Post";
@@ -19,6 +25,24 @@ interface SingleBoardProps {
 interface SingleBoardState {
   modalVisible: boolean;
   modalLoading: boolean;
+  formValid: boolean;
+}
+
+interface FormRef {
+  context: object;
+  props: FormComponentProps;
+  refs: object;
+  state: null;
+  submitHandler: React.FormEventHandler;
+}
+
+interface MutationHandler {
+  (mutationFn: MutationFn, mutationResult: MutationResult): JSX.Element;
+}
+
+interface PostFormFields {
+  postTitle: string;
+  postContent: string;
 }
 
 const SINGLE_BOARD_QUERY = gql`
@@ -61,15 +85,29 @@ export default class Board extends Component<
   state: SingleBoardState = {
     modalVisible: false,
     modalLoading: false,
+    formValid: false,
   };
 
   showModal = () => {
     this.setState({ modalVisible: true });
   };
 
-  modalOkHandler = () => {
-    this.setState({
-      modalVisible: false,
+  modalOkHandler = (mutationFn: MutationFn<any, OperationVariables>) => {
+    // e: React.MouseEvent<any, MouseEvent> = null
+    // e.preventDefault();
+    const form = this.formRef.props.form;
+    form.validateFields((err, values: PostFormFields) => {
+      if (!err) {
+        console.log(values);
+        await mutationFn({
+          variables: {
+            title: values.postTitle,
+            content: values.postContent,
+            boardName
+          },
+        });
+        // unset loading to ok
+      }
     });
   };
 
@@ -78,6 +116,18 @@ export default class Board extends Component<
       modalVisible: false,
     });
   };
+
+  formRef!: FormRef;
+
+  saveFormRef = (formRef: FormRef) => {
+    this.formRef = formRef;
+  };
+
+  mutationHandler() {
+    <Mutation mutation={CREATE_POST_MUTATION}>
+      {(createBoard, { loading }) => <p>{loading}</p>}
+    </Mutation>;
+  }
 
   render() {
     const id = this.props.query.id;
@@ -117,12 +167,7 @@ export default class Board extends Component<
                   size="large"
                   dataSource={posts}
                   renderItem={(post: PostProps) => (
-                    <Post
-                      id={post.id}
-                      content={post.content}
-                      title={post.title}
-                      key={post.id}
-                    />
+                    <Post {...post} key={post.id} />
                   )}
                 />
               </>
@@ -131,16 +176,18 @@ export default class Board extends Component<
         </Query>
 
         <Mutation mutation={CREATE_POST_MUTATION}>
-          {(createPost, { data }) => (
+          {(createBoard, { loading }) => (
             <Modal
               title="Create new post"
               visible={this.state.modalVisible}
-              onOk={async e => {
-                e.preventDefault();
-              }}
+              onOk={createBoard => this.modalOkHandler(createBoard)}
               onCancel={this.modalCancelHandler}
+              // confirmLoading={loading}
+              destroyOnClose={false}
             >
-              <PostForm />
+              <fieldset disabled={loading} aria-busy={loading}>
+                <PostForm wrappedComponentRef={this.saveFormRef} />
+              </fieldset>
             </Modal>
           )}
         </Mutation>
