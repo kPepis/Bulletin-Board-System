@@ -4,13 +4,7 @@ import gql from "graphql-tag";
 import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
-import {
-  Mutation,
-  Query,
-  MutationResult,
-  MutationFn,
-  OperationVariables,
-} from "react-apollo";
+import { Mutation, MutationFn, MutationResult, Query } from "react-apollo";
 import { PacmanLoader } from "react-spinners";
 
 import Post, { PostProps } from "../components/Post";
@@ -64,9 +58,9 @@ const CREATE_POST_MUTATION = gql`
   mutation CREATE_POST_MUTATION(
     $title: String!
     $content: String!
-    $board: String!
+    $boardId: String!
   ) {
-    createPost(title: $title, content: $content, boardName: $board) {
+    createPost(title: $title, content: $content, boardId: $boardId) {
       title
       content
     }
@@ -92,25 +86,6 @@ export default class Board extends Component<
     this.setState({ modalVisible: true });
   };
 
-  modalOkHandler = (mutationFn: MutationFn<any, OperationVariables>) => {
-    // e: React.MouseEvent<any, MouseEvent> = null
-    // e.preventDefault();
-    const form = this.formRef.props.form;
-    form.validateFields((err, values: PostFormFields) => {
-      if (!err) {
-        console.log(values);
-        await mutationFn({
-          variables: {
-            title: values.postTitle,
-            content: values.postContent,
-            boardName
-          },
-        });
-        // unset loading to ok
-      }
-    });
-  };
-
   modalCancelHandler = () => {
     this.setState({
       modalVisible: false,
@@ -122,12 +97,6 @@ export default class Board extends Component<
   saveFormRef = (formRef: FormRef) => {
     this.formRef = formRef;
   };
-
-  mutationHandler() {
-    <Mutation mutation={CREATE_POST_MUTATION}>
-      {(createBoard, { loading }) => <p>{loading}</p>}
-    </Mutation>;
-  }
 
   render() {
     const id = this.props.query.id;
@@ -176,13 +145,29 @@ export default class Board extends Component<
         </Query>
 
         <Mutation mutation={CREATE_POST_MUTATION}>
-          {(createBoard, { loading }) => (
+          {(createPost, { loading }) => (
             <Modal
               title="Create new post"
               visible={this.state.modalVisible}
-              onOk={createBoard => this.modalOkHandler(createBoard)}
+              onOk={e => {
+                e.preventDefault();
+                const form = this.formRef.props.form;
+                form.validateFields(async (err, values: PostFormFields) => {
+                  if (!err) {
+                    console.log(values);
+                    console.log(this.props.query);
+                    await createPost({
+                      variables: {
+                        title: values.postTitle,
+                        content: values.postContent,
+                        boardId: id,
+                      },
+                    });
+                  }
+                });
+              }}
               onCancel={this.modalCancelHandler}
-              // confirmLoading={loading}
+              confirmLoading={loading}
               destroyOnClose={false}
             >
               <fieldset disabled={loading} aria-busy={loading}>

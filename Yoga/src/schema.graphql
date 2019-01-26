@@ -3,7 +3,7 @@
 type Mutation {
   createUser(userName: String!, password: String!): User!
   createBoard(name: String!, description: String!): Board!
-  createPost(title: String!, content: String!, boardName: String!): Post!
+  createPost(title: String!, content: String!, boardId: String!): Post!
 }
 
 type Query {
