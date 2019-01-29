@@ -184,6 +184,8 @@ export type PostOrderByInput =
   | "title_DESC"
   | "content_ASC"
   | "content_DESC"
+  | "image_ASC"
+  | "image_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -255,6 +257,20 @@ export interface PostWhereInput {
   content_not_starts_with?: String;
   content_ends_with?: String;
   content_not_ends_with?: String;
+  image?: String;
+  image_not?: String;
+  image_in?: String[] | String;
+  image_not_in?: String[] | String;
+  image_lt?: String;
+  image_lte?: String;
+  image_gt?: String;
+  image_gte?: String;
+  image_contains?: String;
+  image_not_contains?: String;
+  image_starts_with?: String;
+  image_not_starts_with?: String;
+  image_ends_with?: String;
+  image_not_ends_with?: String;
   createdAt?: DateTimeInput;
   createdAt_not?: DateTimeInput;
   createdAt_in?: DateTimeInput[] | DateTimeInput;
@@ -395,6 +411,7 @@ export interface PostCreateManyWithoutBoardInput {
 export interface PostCreateWithoutBoardInput {
   title: String;
   content: String;
+  image: String;
 }
 
 export interface BoardUpdateInput {
@@ -428,6 +445,7 @@ export interface PostUpdateWithWhereUniqueWithoutBoardInput {
 export interface PostUpdateWithoutBoardDataInput {
   title?: String;
   content?: String;
+  image?: String;
 }
 
 export interface PostUpsertWithWhereUniqueWithoutBoardInput {
@@ -479,6 +497,20 @@ export interface PostScalarWhereInput {
   content_not_starts_with?: String;
   content_ends_with?: String;
   content_not_ends_with?: String;
+  image?: String;
+  image_not?: String;
+  image_in?: String[] | String;
+  image_not_in?: String[] | String;
+  image_lt?: String;
+  image_lte?: String;
+  image_gt?: String;
+  image_gte?: String;
+  image_contains?: String;
+  image_not_contains?: String;
+  image_starts_with?: String;
+  image_not_starts_with?: String;
+  image_ends_with?: String;
+  image_not_ends_with?: String;
   createdAt?: DateTimeInput;
   createdAt_not?: DateTimeInput;
   createdAt_in?: DateTimeInput[] | DateTimeInput;
@@ -508,6 +540,7 @@ export interface PostUpdateManyWithWhereNestedInput {
 export interface PostUpdateManyDataInput {
   title?: String;
   content?: String;
+  image?: String;
 }
 
 export interface BoardUpdateManyMutationInput {
@@ -518,6 +551,7 @@ export interface BoardUpdateManyMutationInput {
 export interface PostCreateInput {
   title: String;
   content: String;
+  image: String;
   board: BoardCreateOneWithoutPostsInput;
 }
 
@@ -534,6 +568,7 @@ export interface BoardCreateWithoutPostsInput {
 export interface PostUpdateInput {
   title?: String;
   content?: String;
+  image?: String;
   board?: BoardUpdateOneRequiredWithoutPostsInput;
 }
 
@@ -557,6 +592,7 @@ export interface BoardUpsertWithoutPostsInput {
 export interface PostUpdateManyMutationInput {
   title?: String;
   content?: String;
+  image?: String;
 }
 
 export interface UserCreateInput {
@@ -601,6 +637,7 @@ export interface PostUpdateWithWhereUniqueNestedInput {
 export interface PostUpdateDataInput {
   title?: String;
   content?: String;
+  image?: String;
   board?: BoardUpdateOneRequiredWithoutPostsInput;
 }
 
@@ -694,6 +731,7 @@ export interface Post {
   id: ID_Output;
   title: String;
   content: String;
+  image: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -702,6 +740,7 @@ export interface PostPromise extends Promise<Post>, Fragmentable {
   id: () => Promise<ID_Output>;
   title: () => Promise<String>;
   content: () => Promise<String>;
+  image: () => Promise<String>;
   board: <T = BoardPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -713,6 +752,7 @@ export interface PostSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   title: () => Promise<AsyncIterator<String>>;
   content: () => Promise<AsyncIterator<String>>;
+  image: () => Promise<AsyncIterator<String>>;
   board: <T = BoardSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -1033,6 +1073,7 @@ export interface PostPreviousValues {
   id: ID_Output;
   title: String;
   content: String;
+  image: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -1043,6 +1084,7 @@ export interface PostPreviousValuesPromise
   id: () => Promise<ID_Output>;
   title: () => Promise<String>;
   content: () => Promise<String>;
+  image: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -1053,6 +1095,7 @@ export interface PostPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   title: () => Promise<AsyncIterator<String>>;
   content: () => Promise<AsyncIterator<String>>;
+  image: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }

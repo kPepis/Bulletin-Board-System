@@ -208,6 +208,7 @@ type Post {
   id: ID!
   title: String!
   content: String!
+  image: String!
   board: Board!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -222,6 +223,7 @@ type PostConnection {
 input PostCreateInput {
   title: String!
   content: String!
+  image: String!
   board: BoardCreateOneWithoutPostsInput!
 }
 
@@ -238,6 +240,7 @@ input PostCreateManyWithoutBoardInput {
 input PostCreateWithoutBoardInput {
   title: String!
   content: String!
+  image: String!
 }
 
 type PostEdge {
@@ -252,6 +255,8 @@ enum PostOrderByInput {
   title_DESC
   content_ASC
   content_DESC
+  image_ASC
+  image_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -262,6 +267,7 @@ type PostPreviousValues {
   id: ID!
   title: String!
   content: String!
+  image: String!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -309,6 +315,20 @@ input PostScalarWhereInput {
   content_not_starts_with: String
   content_ends_with: String
   content_not_ends_with: String
+  image: String
+  image_not: String
+  image_in: [String!]
+  image_not_in: [String!]
+  image_lt: String
+  image_lte: String
+  image_gt: String
+  image_gte: String
+  image_contains: String
+  image_not_contains: String
+  image_starts_with: String
+  image_not_starts_with: String
+  image_ends_with: String
+  image_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -351,18 +371,21 @@ input PostSubscriptionWhereInput {
 input PostUpdateDataInput {
   title: String
   content: String
+  image: String
   board: BoardUpdateOneRequiredWithoutPostsInput
 }
 
 input PostUpdateInput {
   title: String
   content: String
+  image: String
   board: BoardUpdateOneRequiredWithoutPostsInput
 }
 
 input PostUpdateManyDataInput {
   title: String
   content: String
+  image: String
 }
 
 input PostUpdateManyInput {
@@ -379,6 +402,7 @@ input PostUpdateManyInput {
 input PostUpdateManyMutationInput {
   title: String
   content: String
+  image: String
 }
 
 input PostUpdateManyWithoutBoardInput {
@@ -400,6 +424,7 @@ input PostUpdateManyWithWhereNestedInput {
 input PostUpdateWithoutBoardDataInput {
   title: String
   content: String
+  image: String
 }
 
 input PostUpdateWithWhereUniqueNestedInput {
@@ -467,6 +492,20 @@ input PostWhereInput {
   content_not_starts_with: String
   content_ends_with: String
   content_not_ends_with: String
+  image: String
+  image_not: String
+  image_in: [String!]
+  image_not_in: [String!]
+  image_lt: String
+  image_lte: String
+  image_gt: String
+  image_gte: String
+  image_contains: String
+  image_not_contains: String
+  image_starts_with: String
+  image_not_starts_with: String
+  image_ends_with: String
+  image_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]

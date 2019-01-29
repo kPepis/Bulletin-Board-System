@@ -3,7 +3,12 @@
 type Mutation {
   createUser(userName: String!, password: String!): User!
   createBoard(name: String!, description: String!): Board!
-  createPost(title: String!, content: String!, boardId: String!): Post!
+  createPost(
+    title: String!
+    content: String!
+    boardId: String!
+    image: String!
+  ): Post!
 }
 
 type Query {
@@ -23,9 +28,3 @@ type Query {
 
   posts: [Post]!
 }
-
-# type BoardConnection {
-#   pageInfo: PageInfo!
-#   edges: [BoardEdge]!
-#   aggregate: AggregateBoard
-# }

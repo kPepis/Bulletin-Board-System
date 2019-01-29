@@ -1,6 +1,7 @@
 import { Avatar, List } from "antd";
 import React, { Component } from "react";
 import { lightSpeedIn } from "react-animations";
+import CanvasDraw from "react-canvas-draw";
 import styled, { keyframes } from "styled-components";
 
 const bounceAnimation = keyframes`${lightSpeedIn}`;
@@ -13,23 +14,27 @@ export interface PostProps {
   // author: string;
   title: string;
   content: string;
+  image: string;
   // board: string;
-  // createdAt: string;
-  // updatedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default class Post extends Component<PostProps> {
   render() {
-    const { id, title, content } = this.props;
-
+    const { id, title, content, image } = this.props;
+    console.log(image);
     return (
       <AnimationWrapper>
         <List.Item
           extra={
-            <img
-              alt="user avatar"
-              src={`https://robohash.org/${id}`}
-              width={100}
+            <CanvasDraw
+              loadTimeOffset={20}
+              hideGrid
+              canvasWidth={150}
+              canvasHeight={150}
+              disabled
+              saveData={image}
             />
           }
         >

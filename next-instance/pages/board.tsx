@@ -5,6 +5,7 @@ import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
 import { Mutation, MutationFn, MutationResult, Query } from "react-apollo";
+import CanvasDraw from "react-canvas-draw";
 import { PacmanLoader } from "react-spinners";
 
 import Post, { PostProps } from "../components/Post";
@@ -30,10 +31,6 @@ interface FormRef {
   submitHandler: React.FormEventHandler;
 }
 
-interface MutationHandler {
-  (mutationFn: MutationFn, mutationResult: MutationResult): JSX.Element;
-}
-
 interface PostFormFields {
   postTitle: string;
   postContent: string;
@@ -49,6 +46,7 @@ const SINGLE_BOARD_QUERY = gql`
         id
         title
         content
+        image
       }
     }
   }
@@ -59,13 +57,26 @@ const CREATE_POST_MUTATION = gql`
     $title: String!
     $content: String!
     $boardId: String!
+    $image: String!
   ) {
-    createPost(title: $title, content: $content, boardId: $boardId) {
+    createPost(
+      title: $title
+      content: $content
+      boardId: $boardId
+      image: $image
+    ) {
       title
       content
     }
   }
 `;
+
+interface DrawingCanvas {
+  getSaveData: () => string;
+  loadSaveData: (saveData: string, immediate: boolean) => void;
+  clear: () => void;
+  undo: () => void;
+}
 
 export default class Board extends Component<
   SingleBoardProps & FormComponentProps,
@@ -87,12 +98,15 @@ export default class Board extends Component<
   };
 
   modalCancelHandler = () => {
+    console.log(this.loadableCanvas.getSaveData());
     this.setState({
       modalVisible: false,
     });
   };
 
   formRef!: FormRef;
+
+  loadableCanvas!: DrawingCanvas;
 
   saveFormRef = (formRef: FormRef) => {
     this.formRef = formRef;
@@ -149,6 +163,9 @@ export default class Board extends Component<
             <Modal
               title="Create new post"
               visible={this.state.modalVisible}
+              confirmLoading={loading}
+              destroyOnClose={true}
+              onCancel={this.modalCancelHandler}
               onOk={e => {
                 e.preventDefault();
                 const form = this.formRef.props.form;
@@ -156,22 +173,30 @@ export default class Board extends Component<
                   if (!err) {
                     console.log(values);
                     console.log(this.props.query);
+                    const image = this.loadableCanvas.getSaveData();
                     await createPost({
                       variables: {
                         title: values.postTitle,
                         content: values.postContent,
                         boardId: id,
+                        image,
                       },
                     });
                   }
                 });
               }}
-              onCancel={this.modalCancelHandler}
-              confirmLoading={loading}
-              destroyOnClose={false}
             >
               <fieldset disabled={loading} aria-busy={loading}>
                 <PostForm wrappedComponentRef={this.saveFormRef} />
+                <CanvasDraw
+                  ref={(canvasDraw: DrawingCanvas) =>
+                    (this.loadableCanvas = canvasDraw)
+                  }
+                  canvasWidth={472}
+                  canvasHeight={250}
+                  imgSrc=""
+                  disabled={loading}
+                />
               </fieldset>
             </Modal>
           )}

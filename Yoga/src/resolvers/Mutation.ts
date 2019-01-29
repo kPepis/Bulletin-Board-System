@@ -24,13 +24,14 @@ const Mutation: Record<string, GraphQlQueryMethod> = {
   },
 
   async createPost(parent, args, ctx, info) {
-    const { title, content, boardId } = args;
+    const { title, content, boardId, image } = args;
     return await ctx.db.createPost({
       title,
       content,
       board: {
         connect: { id: boardId },
       },
+      image,
     });
   },
 };

@@ -1,9 +1,8 @@
-import { Col, Icon, Input, Row } from "antd";
+import { Button, Col, Icon, Input, Row } from "antd";
 import { ColProps } from "antd/lib/col";
-import Form, { FormComponentProps, ValidateCallback } from "antd/lib/form";
+import Form, { FormComponentProps } from "antd/lib/form";
 import gql from "graphql-tag";
 import React, { Component } from "react";
-import { Mutation } from "react-apollo";
 
 const CREATE_BOARD_MUTATION = gql`
   mutation CREATE_BOARD_MUTATION($name: String!, $description: String!) {
@@ -55,75 +54,61 @@ class PostForm extends Component<FormComponentProps> {
     return (
       <Row type={"flex"} justify="center" align="middle">
         <Col {...colLayout}>
-          <Mutation
-            mutation={CREATE_BOARD_MUTATION}
-            variables={{
-              name: form.getFieldValue("boardName"),
-              description: form.getFieldValue("boardDescription"),
-            }}
+          <Form
+            className={"form-container"}
+            layout="vertical"
+            hideRequiredMark={false}
           >
-            {(createBoard, { loading }) => (
-              <fieldset disabled={loading} aria-busy={loading}>
-                <Form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    this.props.form.validateFields((err, values: any) => {
-                      if (!err) {
-                        console.log(values);
-                      }
-                    });
-                  }}
-                  className={"form-container"}
-                  layout="vertical"
-                  hideRequiredMark={false}
-                >
-                  <Form.Item {...formItemLayout}>
-                    {getFieldDecorator("postTitle", {
-                      rules: [
-                        {
-                          required: true,
-                          message: "Please enter a post title",
-                        },
-                      ],
-                    })(
-                      <Input
-                        allowClear={true}
-                        prefix={
-                          <Icon
-                            type="message"
-                            style={{ color: "rgba(0,0,0,.25)" }}
-                            theme="twoTone"
-                          />
-                        }
-                        placeholder="Enter a post title"
-                        size={"large"}
-                      />,
-                    )}
-                  </Form.Item>
+            <Form.Item {...formItemLayout}>
+              {getFieldDecorator("postTitle", {
+                rules: [
+                  {
+                    required: true,
+                    message: "Please enter a post title",
+                  },
+                ],
+              })(
+                <Input
+                  allowClear={true}
+                  prefix={
+                    <Icon
+                      type="message"
+                      style={{ color: "rgba(0,0,0,.25)" }}
+                      theme="twoTone"
+                    />
+                  }
+                  placeholder="Enter a post title"
+                  size={"large"}
+                />,
+              )}
+            </Form.Item>
 
-                  <Form.Item {...formItemLayout}>
-                    {getFieldDecorator("postContent", {
-                      rules: [
-                        {
-                          required: true,
-                          message: "Posts cannot be empty",
-                          whitespace: true,
-                        },
-                      ],
-                    })(
-                      <TextArea
-                        autosize={{
-                          minRows: 4,
-                          maxRows: 8,
-                        }}
-                        placeholder="Please type your post"
-                      />,
-                    )}
-                  </Form.Item>
-                </Form>
-              </fieldset>
-            )}
-          </Mutation>
+            <Form.Item {...formItemLayout}>
+              {getFieldDecorator("postContent", {
+                rules: [
+                  {
+                    required: true,
+                    message: "Posts cannot be empty",
+                    whitespace: true,
+                  },
+                ],
+              })(
+                <TextArea
+                  autosize={{ minRows: 4, maxRows: 8 }}
+                  placeholder="Please type your post"
+                />,
+              )}
+            </Form.Item>
+
+            <Form.Item>
+              <p>
+                You can use the area below to include a drawing in your post.
+              </p>
+              <Button type="primary" shape="round">
+                Clear
+              </Button>
+            </Form.Item>
+          </Form>
         </Col>
       </Row>
     );
