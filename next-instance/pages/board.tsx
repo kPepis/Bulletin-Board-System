@@ -72,7 +72,7 @@ const CREATE_POST_MUTATION = gql`
 `;
 
 export default class Board extends Component<
-  SingleBoardProps & FormComponentProps,
+  SingleBoardProps,
   SingleBoardState
 > {
   static async getInitialProps(ctx: NextContext) {
@@ -179,9 +179,7 @@ export default class Board extends Component<
               <fieldset disabled={loading} aria-busy={loading}>
                 <PostForm wrappedComponentRef={this.saveFormRef} />
                 <CanvasDraw
-                  ref={(canvasDraw: DrawingCanvas) =>
-                    (this.loadableCanvas = canvasDraw)
-                  }
+                  ref={(canvasDraw: any) => (this.loadableCanvas = canvasDraw)}
                   canvasWidth={472}
                   canvasHeight={250}
                   imgSrc=""

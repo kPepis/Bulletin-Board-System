@@ -8,6 +8,7 @@ export interface DrawingCanvas {
 }
 
 export interface CanvasDrawProps {
+  ref: Function;
   brushColor?: string;
   brushRadius?: number;
   canvasHeight?: number;
@@ -19,10 +20,10 @@ export interface CanvasDrawProps {
   imgSrc?: string;
   immediateLoading?: boolean;
   lazyRadius?: number;
-  loadTimeOffset:? number;
+  loadTimeOffset?: number;
   saveData?: string;
 }
 
-declare const CanvasDraw: React.ComponentClass<CanvasDrawProps, any>;
+declare const CanvasDraw: React.ComponentClass<CanvasDrawProps>;
 
 export default CanvasDraw;

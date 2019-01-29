@@ -61,15 +61,6 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
     const form = this.props.form;
     const { getFieldDecorator } = this.props.form;
 
-    // const colLayout: ColProps = {
-    //   xs: { span: 24 },
-    //   sm: { span: 15 },
-    //   md: { span: 8, offset: 8 },
-    //   lg: { span: 8, offset: 8 },
-    //   xl: { span: 6, offset: 9 },
-    //   xxl: { span: 4, offset: 10 },
-    // };
-
     const colLayout: ColProps = {
       xs: { span: 24 },
       sm: { span: 15 },
@@ -108,7 +99,7 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
                         // Call the mutation function (CreateUser)
                         await createUser();
                         // Redirect them to the boards page
-                        Router.push("/boards");
+                        await Router.push("/boards");
                       }
                     });
                   }}

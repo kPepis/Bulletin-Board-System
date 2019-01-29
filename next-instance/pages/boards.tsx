@@ -62,9 +62,9 @@ export default class Boards extends Component<BoardsProps> {
     return { page };
   }
 
-  async onPageChange(page: number) {
+  onPageChange = async (page: number) => {
     await Router.push({ pathname: "/boards", query: { page } });
-  }
+  };
 
   render() {
     const boardsToShowConfig: BoardsQuery = {
