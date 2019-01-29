@@ -23,7 +23,6 @@ export interface PostProps {
 export default class Post extends Component<PostProps> {
   render() {
     const { id, title, content, image } = this.props;
-    console.log(image);
     return (
       <AnimationWrapper>
         <List.Item

@@ -5,7 +5,7 @@ import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
 import { Mutation, MutationFn, MutationResult, Query } from "react-apollo";
-import CanvasDraw from "react-canvas-draw";
+import CanvasDraw, { DrawingCanvas } from "react-canvas-draw";
 import { PacmanLoader } from "react-spinners";
 
 import Post, { PostProps } from "../components/Post";
@@ -70,13 +70,6 @@ const CREATE_POST_MUTATION = gql`
     }
   }
 `;
-
-interface DrawingCanvas {
-  getSaveData: () => string;
-  loadSaveData: (saveData: string, immediate: boolean) => void;
-  clear: () => void;
-  undo: () => void;
-}
 
 export default class Board extends Component<
   SingleBoardProps & FormComponentProps,
