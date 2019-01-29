@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.3",
     "graphql-yoga": "^1.17.1",
     "prisma-binding": "^2.3.0",
     "prisma-client-lib": "^1.25.4"
