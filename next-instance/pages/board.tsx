@@ -91,7 +91,6 @@ export default class Board extends Component<
   };
 
   modalCancelHandler = () => {
-    console.log(this.loadableCanvas.getSaveData());
     this.setState({
       modalVisible: false,
     });
@@ -164,8 +163,6 @@ export default class Board extends Component<
                 const form = this.formRef.props.form;
                 form.validateFields(async (err, values: PostFormFields) => {
                   if (!err) {
-                    console.log(values);
-                    console.log(this.props.query);
                     const image = this.loadableCanvas.getSaveData();
                     await createPost({
                       variables: {
