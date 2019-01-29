@@ -3,7 +3,7 @@ type User {
   userName: String! @unique
   password: String!
   posts: [Post!]! @relation(link: INLINE, onDelete: CASCADE)
-  # boards: [Board]! @relation(link: INLINE)
+  permissions: [Permission]
 }
 
 type Board {
@@ -24,4 +24,14 @@ type Post {
   board: Board! @relation(name: "BoardPosts")
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+}
+
+enum Permission {
+  ADMIN
+  USER
+  BOARDUPDATE
+  BOARDDELETE
+  POSTUPDATE
+  POSTDELETE
+  PERMISSIONUPDATE
 }
