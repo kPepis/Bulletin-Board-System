@@ -204,6 +204,16 @@ type PageInfo {
   endCursor: String
 }
 
+enum Permission {
+  ADMIN
+  USER
+  BOARDUPDATE
+  BOARDDELETE
+  POSTUPDATE
+  POSTDELETE
+  PERMISSIONUPDATE
+}
+
 type Post {
   id: ID!
   title: String!
@@ -555,6 +565,7 @@ type User {
   userName: String!
   password: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  permissions: [Permission!]!
 }
 
 type UserConnection {
@@ -567,6 +578,11 @@ input UserCreateInput {
   userName: String!
   password: String!
   posts: PostCreateManyInput
+  permissions: UserCreatepermissionsInput
+}
+
+input UserCreatepermissionsInput {
+  set: [Permission!]
 }
 
 type UserEdge {
@@ -587,6 +603,7 @@ type UserPreviousValues {
   id: ID!
   userName: String!
   password: String!
+  permissions: [Permission!]!
 }
 
 type UserSubscriptionPayload {
@@ -611,11 +628,17 @@ input UserUpdateInput {
   userName: String
   password: String
   posts: PostUpdateManyInput
+  permissions: UserUpdatepermissionsInput
 }
 
 input UserUpdateManyMutationInput {
   userName: String
   password: String
+  permissions: UserUpdatepermissionsInput
+}
+
+input UserUpdatepermissionsInput {
+  set: [Permission!]
 }
 
 input UserWhereInput {

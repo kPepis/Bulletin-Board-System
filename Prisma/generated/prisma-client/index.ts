@@ -199,6 +199,15 @@ export type BoardOrderByInput =
   | "description_ASC"
   | "description_DESC";
 
+export type Permission =
+  | "ADMIN"
+  | "USER"
+  | "BOARDUPDATE"
+  | "BOARDDELETE"
+  | "POSTUPDATE"
+  | "POSTDELETE"
+  | "PERMISSIONUPDATE";
+
 export type UserOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -599,6 +608,7 @@ export interface UserCreateInput {
   userName: String;
   password: String;
   posts?: PostCreateManyInput;
+  permissions?: UserCreatepermissionsInput;
 }
 
 export interface PostCreateManyInput {
@@ -606,10 +616,15 @@ export interface PostCreateManyInput {
   connect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
 }
 
+export interface UserCreatepermissionsInput {
+  set?: Permission[] | Permission;
+}
+
 export interface UserUpdateInput {
   userName?: String;
   password?: String;
   posts?: PostUpdateManyInput;
+  permissions?: UserUpdatepermissionsInput;
 }
 
 export interface PostUpdateManyInput {
@@ -647,9 +662,14 @@ export interface PostUpsertWithWhereUniqueNestedInput {
   create: PostCreateInput;
 }
 
+export interface UserUpdatepermissionsInput {
+  set?: Permission[] | Permission;
+}
+
 export interface UserUpdateManyMutationInput {
   userName?: String;
   password?: String;
+  permissions?: UserUpdatepermissionsInput;
 }
 
 export interface BoardSubscriptionWhereInput {
@@ -893,6 +913,7 @@ export interface User {
   id: ID_Output;
   userName: String;
   password: String;
+  permissions: Permission[];
 }
 
 export interface UserPromise extends Promise<User>, Fragmentable {
@@ -908,6 +929,7 @@ export interface UserPromise extends Promise<User>, Fragmentable {
     first?: Int;
     last?: Int;
   }) => T;
+  permissions: () => Promise<Permission[]>;
 }
 
 export interface UserSubscription
@@ -925,6 +947,7 @@ export interface UserSubscription
     first?: Int;
     last?: Int;
   }) => T;
+  permissions: () => Promise<AsyncIterator<Permission[]>>;
 }
 
 export interface UserConnection {
@@ -1129,6 +1152,7 @@ export interface UserPreviousValues {
   id: ID_Output;
   userName: String;
   password: String;
+  permissions: Permission[];
 }
 
 export interface UserPreviousValuesPromise
@@ -1137,6 +1161,7 @@ export interface UserPreviousValuesPromise
   id: () => Promise<ID_Output>;
   userName: () => Promise<String>;
   password: () => Promise<String>;
+  permissions: () => Promise<Permission[]>;
 }
 
 export interface UserPreviousValuesSubscription
@@ -1145,6 +1170,7 @@ export interface UserPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   userName: () => Promise<AsyncIterator<String>>;
   password: () => Promise<AsyncIterator<String>>;
+  permissions: () => Promise<AsyncIterator<Permission[]>>;
 }
 
 /*
@@ -1187,6 +1213,10 @@ export type Long = string;
 export const models: Model[] = [
   {
     name: "Board",
+    embedded: false
+  },
+  {
+    name: "Permission",
     embedded: false
   },
   {
