@@ -8,9 +8,9 @@ import Router from "next/router";
 import React, { Component } from "react";
 import { Mutation } from "react-apollo";
 
-export const CREATE_USER_MUTATION = gql`
-  mutation CREATE_USER_MUTATION($userName: String!, $password: String!) {
-    createUser(userName: $userName, password: $password) {
+export const SIGN_UP_MUTATION = gql`
+  mutation SIGN_UP_MUTATION($userName: String!, $password: String!) {
+    signUp(userName: $userName, password: $password) {
       id
       userName
     }
@@ -85,10 +85,10 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
       <Row type="flex" justify="center" align="middle">
         <Col {...colLayout} className={"centered-col"}>
           <Mutation
-            mutation={CREATE_USER_MUTATION}
+            mutation={SIGN_UP_MUTATION}
             variables={{ ...form.getFieldsValue(["userName", "password"]) }}
           >
-            {(createUser, { loading, error }) => (
+            {(signUp, { loading, error, data }) => (
               <fieldset disabled={loading} aria-busy={loading}>
                 <Form
                   onSubmit={e => {
@@ -97,7 +97,9 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
                     this.props.form.validateFields(async (err, values) => {
                       if (!err) {
                         // Call the mutation function (CreateUser)
-                        await createUser();
+                        // todo show in UI if user already exists
+                        const user = await signUp();
+
                         // Redirect them to the boards page
                         await Router.push("/boards");
                       }
