@@ -1,5 +1,6 @@
+import bcrypt from "bcryptjs";
 import { GraphQLResolveInfo } from "graphql";
-import { forwardTo } from "prisma-binding";
+import jwt from "jsonwebtoken";
 
 import { Context } from "./types/Context";
 
@@ -14,6 +15,37 @@ const Mutation: Record<string, GraphQlQueryMethod> = {
     return await ctx.db.createUser({
       ...args,
     });
+  },
+
+  async signUp(
+    parent,
+    args: { userName: string; password: string },
+    ctx,
+    info,
+  ) {
+    // lowercase username
+    const userName = args.userName.toLowerCase();
+
+    // hash password
+    const password = await bcrypt.hash(args.password, 10);
+
+    // create user in db
+    const user = await ctx.db.createUser({
+      userName,
+      password,
+      permissions: { set: ["USER"] },
+    });
+
+    // create JWT
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET!);
+
+    // set cookie with JWT on the response
+    ctx.response.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 10, // 10 hour cookie
+    });
+
+    return user;
   },
 
   async createBoard(parent, args, ctx, info) {

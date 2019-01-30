@@ -4,7 +4,7 @@ import gql from "graphql-tag";
 import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
-import { Mutation, MutationFn, MutationResult, Query } from "react-apollo";
+import { Mutation, Query } from "react-apollo";
 import CanvasDraw, { DrawingCanvas } from "react-canvas-draw";
 import { PacmanLoader } from "react-spinners";
 
@@ -86,11 +86,11 @@ export default class Board extends Component<
     formValid: false,
   };
 
-  showModal = () => {
+  showModal: () => void = () => {
     this.setState({ modalVisible: true });
   };
 
-  modalCancelHandler = () => {
+  modalCancelHandler: () => void = () => {
     this.setState({
       modalVisible: false,
     });
@@ -100,7 +100,7 @@ export default class Board extends Component<
 
   loadableCanvas!: DrawingCanvas;
 
-  saveFormRef = (formRef: FormRef) => {
+  saveFormRef: (formRef: FormRef) => void = (formRef) => {
     this.formRef = formRef;
   };
 
@@ -109,7 +109,7 @@ export default class Board extends Component<
 
     const listFooter = (
       <Affix offsetBottom={10}>
-        <Button type="primary" onClick={this.showModal}>
+        <Button type="primary" onClick={this.showModal} htmlType="button">
           Publish new post
         </Button>
       </Affix>
@@ -153,6 +153,7 @@ export default class Board extends Component<
         <Mutation mutation={CREATE_POST_MUTATION}>
           {(createPost, { loading }) => (
             <Modal
+              align={null}
               title="Create new post"
               visible={this.state.modalVisible}
               confirmLoading={loading}

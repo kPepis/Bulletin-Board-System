@@ -4,8 +4,7 @@ import createServer from "./createServer";
 
 const server = createServer();
 
-// todo Use Express middleware for authentication (JWT)
-server.express.use
+server.express.use(cookieParser());
 
 // todo Use Express middleware to populate current user
 server.start(
