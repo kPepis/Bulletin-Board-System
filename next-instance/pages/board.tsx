@@ -12,6 +12,7 @@ import Post, { PostProps } from "../components/Post";
 import PostForm from "../components/PostForm";
 
 interface SingleBoardProps {
+  socket: SocketIOClient.Socket;
   query: {
     id: string;
   };
@@ -87,6 +88,9 @@ export default class Board extends Component<
   };
 
   showModal: () => void = () => {
+    console.log("tes");
+    console.log(this.props.socket.emit);
+    this.props.socket.emit("customEvent");
     this.setState({ modalVisible: true });
   };
 

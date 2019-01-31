@@ -1,9 +1,18 @@
 import cookieParser from "cookie-parser";
+import { execute, subscribe, GraphQLSchema, buildSchema } from "graphql";
 import jwt from "jsonwebtoken";
-
+import { SubscriptionServer } from "subscriptions-transport-ws";
+import Mutation from "./resolvers/Mutation";
+import Query from "./resolvers/Query";
 import createServer from "./createServer";
+import { readFileSync } from "fs";
+// import * as schema from "./generated/prisma-client/prisma-schema";
 
 const server = createServer();
+
+const schemaFile = readFileSync("./src/generated/prisma.graphql", "utf-8");
+
+const schema = buildSchema(schemaFile);
 
 server.express.use(cookieParser());
 
@@ -31,5 +40,18 @@ server.start(
   },
   options => {
     console.log(`Server running on ${process.env.FRONTEND_URL}`);
+  },
+);
+
+SubscriptionServer.create(
+  {
+    schema,
+    execute,
+    subscribe,
+    onOperationComplete: () => "An operation just completed.",
+  },
+  {
+    server: server.express,
+    path: "/",
   },
 );
