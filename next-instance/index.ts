@@ -5,8 +5,8 @@ import { IncomingMessage, ServerResponse } from "http";
 
 const app = express();
 
-let server = require("http").Server(app);
-let io = require("socket.io")(server);
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 
 const port = 3000;
 const dev = process.env.NODE_ENV !== "production";
