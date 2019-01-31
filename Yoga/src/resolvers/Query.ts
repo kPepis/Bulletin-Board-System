@@ -1,38 +1,32 @@
-import { GraphQLResolveInfo } from "graphql";
 import { forwardTo } from "prisma-binding";
 
-import { Context } from "./types/Context";
+import { GraphQL } from "../../types/graphql-interfaces";
 
-interface QueryInterface {
-  (
-    parent: any,
-    args: any,
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ): IterableIterator<any>;
-}
-
-const Query = {
+const Query: Record<string, GraphQL.Query> = {
   users: forwardTo("db"),
   // boards: forwardTo("db"),
-  async boards(parent: any, args: any, ctx: Context, info: GraphQLResolveInfo) {
+  async boards(parent, args, ctx, info) {
     return await ctx.db.boards();
   },
 
-  async board(parent: any, args: any, ctx: Context, info: GraphQLResolveInfo) {
-    return ctx.db.board({
+  async board(parent, args, ctx, info) {
+    return await ctx.db.board({
       ...args.where,
     });
   },
 
   posts: forwardTo("db"),
 
-  async boardsConnection(
-    parent: any,
-    args: any,
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) {
+  me(parent, args, ctx, info) {
+    // check if there is a current user ID
+    if (!ctx.request.userId) {
+      return null;
+    }
+
+    return ctx.db.user({ id: ctx.request.userId });
+  },
+
+  async boardsConnection(parent, args, ctx, info) {
     const connection = await ctx.db.boardsConnection({
       ...args,
     });

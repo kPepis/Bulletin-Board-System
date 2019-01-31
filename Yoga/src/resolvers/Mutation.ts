@@ -1,16 +1,9 @@
 import bcrypt from "bcryptjs";
-import { GraphQLResolveInfo } from "graphql";
 import jwt from "jsonwebtoken";
 
-import { Context } from "./types/Context";
+import { GraphQL } from "../../types/graphql-interfaces";
 
-interface GraphQlQueryMethod {
-  (parent: any, args: any, ctx: Context, info: GraphQLResolveInfo): Promise<
-    any
-  >;
-}
-
-const Mutation: Record<string, GraphQlQueryMethod> = {
+const Mutation: Record<string, GraphQL.Mutation> = {
   async createUser(parent, args, ctx, info) {
     return await ctx.db.createUser({
       ...args,
@@ -45,6 +38,40 @@ const Mutation: Record<string, GraphQlQueryMethod> = {
       maxAge: 1000 * 60 * 60 * 10, // 10 hour cookie
     });
 
+    return user;
+  },
+
+  async signIn(
+    parent,
+    args: { userName: string; password: string },
+    ctx,
+    info,
+  ) {
+    const { userName, password } = args;
+
+    // check if userName exists
+    const userExists = await ctx.db.$exists.user({ userName });
+
+    // throw error if user doesn't exist
+    if (!userExists) throw new Error(`User ${userName} doesn't exist`);
+
+    // get user info
+    const user = await ctx.db.user({ userName });
+
+    // Check if password is correct
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) throw new Error("Invalid password");
+
+    // generate token
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET!);
+
+    // set cookie with token
+    ctx.response.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 10, // 10 hour cookie
+    });
+
+    // return user
     return user;
   },
 

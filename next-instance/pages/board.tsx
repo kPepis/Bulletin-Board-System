@@ -100,7 +100,7 @@ export default class Board extends Component<
 
   loadableCanvas!: DrawingCanvas;
 
-  saveFormRef: (formRef: FormRef) => void = (formRef) => {
+  saveFormRef: (formRef: FormRef) => void = formRef => {
     this.formRef = formRef;
   };
 
@@ -150,7 +150,10 @@ export default class Board extends Component<
           }}
         </Query>
 
-        <Mutation mutation={CREATE_POST_MUTATION}>
+        <Mutation
+          mutation={CREATE_POST_MUTATION}
+          refetchQueries={[{ query: SINGLE_BOARD_QUERY, variables: { id } }]}
+        >
           {(createPost, { loading }) => (
             <Modal
               align={null}
@@ -172,6 +175,9 @@ export default class Board extends Component<
                         boardId: id,
                         image,
                       },
+                    });
+                    this.setState({
+                      modalVisible: false,
                     });
                   }
                 });

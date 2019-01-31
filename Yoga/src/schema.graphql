@@ -3,6 +3,7 @@
 type Mutation {
   createUser(userName: String!, password: String!): User!
   signUp(userName: String!, password: String!): User!
+  signIn(userName: String!, password: String!): User!
   createBoard(name: String!, description: String!): Board!
   createPost(
     title: String!
@@ -28,4 +29,6 @@ type Query {
   boardsConnection(where: BoardWhereInput): BoardConnection!
 
   posts: [Post]!
+
+  me: User
 }
