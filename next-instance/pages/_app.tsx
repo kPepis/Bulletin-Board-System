@@ -7,6 +7,7 @@ import App, { Container, NextAppContext } from "next/app";
 import Link from "next/link";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
+import io from "socket.io-client";
 
 import withData from "../lib/withData";
 
@@ -16,7 +17,11 @@ interface IProps {
   apollo: ApolloClient<any>;
 }
 
-class MyApp extends App<IProps> {
+interface IState {
+  socket?: SocketIOClient.Socket;
+}
+
+class MyApp extends App<IProps, IState> {
   static async getInitialProps(context: NextAppContext) {
     const { Component, ctx } = context;
 
@@ -28,6 +33,27 @@ class MyApp extends App<IProps> {
     // this exposes the query to the user
     pageProps.query = ctx.query;
     return { pageProps };
+  }
+
+  state = {
+    socket: io(),
+  };
+
+  componentDidMount() {
+    // connect to WS server and listen event
+    // const socket = io();
+    // this.setState({ socket });
+    console.log("state", this.state);
+    this.state.socket.emit("userConnection");
+  }
+
+  componentDidUpdate() {}
+
+  // close socket connection
+  componentWillUnmount() {
+    this.state.socket.off("userConnection");
+    console.log("A user has disconnected");
+    this.state.socket.close();
   }
 
   render() {
@@ -60,7 +86,7 @@ class MyApp extends App<IProps> {
 
             <Layout>
               <Content>
-                <Component {...pageProps} />
+                <Component {...pageProps} socket={this.state.socket} />
               </Content>
             </Layout>
           </Layout>
