@@ -2,6 +2,7 @@ const express = require("express");
 const next = require("next");
 
 import { IncomingMessage, ServerResponse } from "http";
+import { Socket } from "socket.io";
 
 const app = express();
 
@@ -13,14 +14,19 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
-io.on("connection", (_socket: SocketIOClient.Socket) => {
-  _socket.on("userConnection", () => console.log("A new user has connected"));
+io.on("connection", (_socket: Socket) => {
+  console.log("A user has connected");
+
   _socket.on("disconnect", () => {
-    console.log("User has disconnected, index.ts");
+    console.log("User has disconnected");
   });
-  _socket.on("customEvent", (lol: any) => {
-    console.log(lol);
-    console.log("The custom event fires");
+
+  _socket.on("board connect", (boardId: string) => {
+    console.log(`A new user has entered board ${boardId}`);
+  });
+
+  _socket.on("board disconnect", (boardId: string) => {
+    console.log(`A user has left board ${boardId}`);
   });
 });
 
