@@ -1,4 +1,4 @@
-import { Affix, Button, List, Modal } from "antd";
+import { Affix, Button, List, Modal, message } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import gql from "graphql-tag";
 import { NextContext } from "next";
@@ -8,23 +8,18 @@ import { Mutation, Query } from "react-apollo";
 import CanvasDraw, { DrawingCanvas } from "react-canvas-draw";
 import { connect } from "react-redux";
 import { PacmanLoader } from "react-spinners";
-import { bindActionCreators, Dispatch } from "redux";
+import { bindActionCreators } from "redux";
 
 import Post, { PostProps } from "../components/Post";
 import PostForm from "../components/PostForm";
-import { countDecrease, countIncrease } from "../lib/count/actions";
 import { updateAnnouncement } from "../lib/states/announcement/actions";
-import withReduxSaga from "../lib/withReduxSaga";
-import Websocket from "react-websocket";
-// import io from "socket.io-client";
 
 interface SingleBoardProps {
   socket: SocketIOClient.Socket;
   query: {
     id: string;
   };
-  announcementMessage: string;
-  updateAnnouncement: any;
+  userName?: string;
 }
 
 interface SingleBoardState {
@@ -83,9 +78,9 @@ const CREATE_POST_MUTATION = gql`
 
 class Board extends Component<SingleBoardProps, SingleBoardState> {
   static async getInitialProps(ctx: NextContext) {
-    const { query } = ctx;
+    const { query, req } = ctx;
 
-    return { query };
+    return { query, userName: req.userName };
   }
 
   state: SingleBoardState = {
@@ -95,12 +90,19 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
   };
 
   componentDidMount(): void {
-    this.props.socket.emit("board connect", this.props.query.id);
+    const socket = this.props.socket;
+    const id = this.props.query.id;
+    socket.emit("board connect", { boardId: id, socketId: socket.id });
+
+    socket.on("user connect", () => {
+      // todo change this.props.userName to the connecting userName
+      message.info(`User ${this.props.userName} is now seeing this board`);
+      console.log("A new user is seeing this board");
+    });
   }
 
   showModal: () => void = () => {
     // this.props.updateAnnouncement("Announcement changed!");
-    console.log(this.props.updateAnnouncement);
     this.setState({ modalVisible: true });
   };
 
@@ -118,32 +120,25 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
     this.formRef = formRef;
   };
 
-  handleWS(data) {
-    // let result = JSON.parse(data);
-    console.log("event", data);
-    console.log("json", JSON.parse(data));
-  }
-
   componentWillUnmount(): void {
     this.props.socket.emit("board disconnect", this.props.query.id);
   }
 
   render() {
     const id = this.props.query.id;
-    const { announcementMessage, updateAnnouncement } = this.props;
 
     const listFooter = (
       <Affix offsetBottom={10}>
         <Button type="primary" onClick={this.showModal} htmlType="button">
           Publish new post
         </Button>
-        <Websocket
-          url="ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
-          onMessage={this.handleWS.bind(this)}
-          onOpen={() => console.log("WS open")}
-          onClose={() => console.log("WS close")}
-          debug={true}
-        />
+        {/*<Websocket*/}
+        {/*url="ws://localhost:3000/socket.io/?EIO=3&transport=websocket"*/}
+        {/*onMessage={(data: any) => console.log(data)}*/}
+        {/*onOpen={() => console.log("WS open")}*/}
+        {/*onClose={() => console.log("WS close")}*/}
+        {/*debug={true}*/}
+        {/*/>*/}
       </Affix>
     );
 

@@ -30,7 +30,10 @@ const Mutation: Record<string, GraphQL.Mutation> = {
     });
 
     // create JWT
-    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET!);
+    const token = jwt.sign(
+      { userId: user.id, userName: user.userName },
+      process.env.APP_SECRET!,
+    );
 
     // set cookie with JWT on the response
     ctx.response.cookie("token", token, {
@@ -63,7 +66,10 @@ const Mutation: Record<string, GraphQL.Mutation> = {
     if (!passwordValid) throw new Error("Invalid password");
 
     // generate token
-    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET!);
+    const token = jwt.sign(
+      { userId: user.id, userName: user.userName },
+      process.env.APP_SECRET!,
+    );
 
     // set cookie with token
     ctx.response.cookie("token", token, {
@@ -76,22 +82,29 @@ const Mutation: Record<string, GraphQL.Mutation> = {
   },
 
   async createBoard(parent, args, ctx, info) {
-    // todo check if user is logged in
+    const isUserLoggedIn = !!ctx.request.userId;
+
+    if (!isUserLoggedIn) {
+      throw new Error("User not logged in");
+    }
+
     return await ctx.db.createBoard({
-      ...args,
+      name: args.name,
+      description: args.description,
+      createdBy: { connect: { userName: args.userName } },
     });
   },
 
   async createPost(parent, args, ctx, info) {
     const { title, content, boardId, image } = args;
-    return await ctx.db.createPost({
-      title,
-      content,
-      board: {
-        connect: { id: boardId },
-      },
-      image,
-    });
+    // return await ctx.db.createPost({
+    //   title,
+    //   content,
+    //   board: {
+    //     connect: { id: boardId },
+    //   },
+    //   image,
+    // });
   },
 };
 

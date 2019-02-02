@@ -1,5 +1,4 @@
 import { Card, Pagination } from "antd";
-import gql from "graphql-tag";
 import { NextContext } from "next";
 import Router from "next/router";
 import React, { Component } from "react";
@@ -9,6 +8,7 @@ import * as PrismaTypes from "../../Prisma/generated/prisma-client/";
 import Board, { BoardProps } from "../components/Board";
 import BoardsForm from "../components/BoardsForm";
 import { perPage } from "../config";
+import { GET_BOARDS_QUERY, PAGINATION_QUERY } from "../graphql/queries";
 
 interface PaginationData {
   boardsConnection: {
@@ -20,6 +20,8 @@ interface PaginationData {
 
 interface BoardsProps {
   page: number;
+  userId?: string;
+  userName?: string;
 }
 
 interface BoardsQuery {
@@ -32,34 +34,11 @@ interface BoardsQuery {
   last?: PrismaTypes.Int;
 }
 
-const GET_ALL_BOARDS = gql`
-  query GET_ALL_BOARDS($skip: Int = 0, $first: Int = ${perPage}) {
-    boards(skip: $skip, first: $first, orderBy: id_DESC) {
-      id
-      name
-      description
-      posts {
-        id
-      }
-    }
-  }
-`;
-
-const PAGINATION_QUERY = gql`
-  query PAGINATION_QUERY {
-    boardsConnection {
-      aggregate {
-        count
-      }
-    }
-  }
-`;
-
 export default class Boards extends Component<BoardsProps> {
   static async getInitialProps(ctx: NextContext) {
-    const { query } = ctx;
+    const { query, req } = ctx;
     const page: number = query.page ? parseInt(query.page as string) : 1;
-    return { page };
+    return { page, userId: req.userId, userName: req.userName };
   }
 
   onPageChange = async (page: number) => {
@@ -75,7 +54,7 @@ export default class Boards extends Component<BoardsProps> {
     return (
       <>
         <Query
-          query={GET_ALL_BOARDS}
+          query={GET_BOARDS_QUERY}
           variables={boardsToShowConfig}
           fetchPolicy="network-only"
         >
@@ -126,7 +105,8 @@ export default class Boards extends Component<BoardsProps> {
           }}
         </Query>
 
-        <BoardsForm />
+        {/*todo render only if user is logged in*/}
+        <BoardsForm userName={this.props.userName!} userId={this.props.userId!} />
       </>
     );
   }

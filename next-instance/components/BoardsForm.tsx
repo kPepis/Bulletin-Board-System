@@ -1,35 +1,31 @@
 import { Button, Col, Form, Icon, Input, Row } from "antd";
 import { ColProps } from "antd/lib/col";
 import { FormComponentProps } from "antd/lib/form";
-import gql from "graphql-tag";
+import { NextContext } from "next";
 import React, { Component } from "react";
-import { Mutation } from "react-apollo";
+import { Mutation, MutationFn } from "react-apollo";
 
-const CREATE_BOARD_MUTATION = gql`
-  mutation CREATE_BOARD_MUTATION($name: String!, $description: String!) {
-    createBoard(name: $name, description: $description) {
-      id
-      name
-      description
-    }
-  }
-`;
+import { BoardCreateInput } from "../../Prisma/generated/prisma-client";
+import { perPage } from "../config";
+import { CREATE_BOARD_MUTATION } from "../graphql/mutations";
+import { GET_BOARDS_QUERY } from "../graphql/queries";
 
 interface NewBoardFormValues {
   boardName: string;
   boardDescription: string;
 }
 
-class NormalLoginForm extends Component<FormComponentProps> {
-  submitHandler: React.FormEventHandler = e => {
-    e.preventDefault();
-    this.props.form.validateFields(async (err, values: NewBoardFormValues) => {
-      if (!err) {
-        console.log(values);
-        // await createBoard();
-      }
-    });
-  };
+interface BoardsFormProps {
+  userId: string;
+  userName: string;
+}
+
+class NormalLoginForm extends Component<FormComponentProps & BoardsFormProps> {
+  static async getInitialProps(ctx: NextContext) {
+    const { query, req } = ctx;
+    const page: number = query.page ? parseInt(query.page as string) : 1;
+    return { page, userId: req.userId, userName: req.userName };
+  }
 
   render() {
     const form = this.props.form;
@@ -39,9 +35,9 @@ class NormalLoginForm extends Component<FormComponentProps> {
       xs: { span: 24 },
       sm: { span: 15 },
       md: { span: 9 },
-      lg: { span: 7 },
-      xl: { span: 5 },
-      xxl: { span: 4 },
+      lg: { span: 8 },
+      xl: { span: 7 },
+      xxl: { span: 5 },
     };
 
     const formItemLayout = {
@@ -58,14 +54,16 @@ class NormalLoginForm extends Component<FormComponentProps> {
     return (
       <Row type={"flex"} justify="center" align="middle">
         <Col {...colLayout}>
+          {/*todo add refetchqueries for boards*/}
           <Mutation
             mutation={CREATE_BOARD_MUTATION}
-            variables={{
-              name: form.getFieldValue("boardName"),
-              description: form.getFieldValue("boardDescription"),
-            }}
+            refetchQueries={[
+              {
+                query: GET_BOARDS_QUERY,
+              },
+            ]}
           >
-            {(createBoard, { loading }) => (
+            {(createBoard: MutationFn<any, any>, { loading }) => (
               <fieldset disabled={loading} aria-busy={loading}>
                 <Form
                   onSubmit={e => {
@@ -73,7 +71,17 @@ class NormalLoginForm extends Component<FormComponentProps> {
                     this.props.form.validateFields(
                       async (err, values: NewBoardFormValues) => {
                         if (!err) {
-                          await createBoard();
+                          const res = await createBoard({
+                            variables: {
+                              name: values.boardName,
+                              description: values.boardDescription,
+                              userName: this.props.userName,
+                            },
+                          });
+                          // if board creation was successful, clear form
+                          if (res) {
+                            form.resetFields();
+                          }
                         }
                       },
                     );

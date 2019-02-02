@@ -19,6 +19,9 @@ type Board {
   name: String!
   description: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  createdBy: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type BoardConnection {
@@ -31,6 +34,7 @@ input BoardCreateInput {
   name: String!
   description: String!
   posts: PostCreateManyWithoutBoardInput
+  createdBy: UserCreateOneInput!
 }
 
 input BoardCreateOneWithoutPostsInput {
@@ -41,6 +45,7 @@ input BoardCreateOneWithoutPostsInput {
 input BoardCreateWithoutPostsInput {
   name: String!
   description: String!
+  createdBy: UserCreateOneInput!
 }
 
 type BoardEdge {
@@ -55,12 +60,18 @@ enum BoardOrderByInput {
   name_DESC
   description_ASC
   description_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type BoardPreviousValues {
   id: ID!
   name: String!
   description: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type BoardSubscriptionPayload {
@@ -85,6 +96,7 @@ input BoardUpdateInput {
   name: String
   description: String
   posts: PostUpdateManyWithoutBoardInput
+  createdBy: UserUpdateOneRequiredInput
 }
 
 input BoardUpdateManyMutationInput {
@@ -102,6 +114,7 @@ input BoardUpdateOneRequiredWithoutPostsInput {
 input BoardUpdateWithoutPostsDataInput {
   name: String
   description: String
+  createdBy: UserUpdateOneRequiredInput
 }
 
 input BoardUpsertWithoutPostsInput {
@@ -152,6 +165,22 @@ input BoardWhereInput {
   description_not_starts_with: String
   description_ends_with: String
   description_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   AND: [BoardWhereInput!]
   OR: [BoardWhereInput!]
   NOT: [BoardWhereInput!]
@@ -216,6 +245,7 @@ enum Permission {
 
 type Post {
   id: ID!
+  author: User!
   title: String!
   content: String!
   image: String!
@@ -231,14 +261,15 @@ type PostConnection {
 }
 
 input PostCreateInput {
+  author: UserCreateOneWithoutPostsInput!
   title: String!
   content: String!
   image: String!
   board: BoardCreateOneWithoutPostsInput!
 }
 
-input PostCreateManyInput {
-  create: [PostCreateInput!]
+input PostCreateManyWithoutAuthorInput {
+  create: [PostCreateWithoutAuthorInput!]
   connect: [PostWhereUniqueInput!]
 }
 
@@ -247,7 +278,15 @@ input PostCreateManyWithoutBoardInput {
   connect: [PostWhereUniqueInput!]
 }
 
+input PostCreateWithoutAuthorInput {
+  title: String!
+  content: String!
+  image: String!
+  board: BoardCreateOneWithoutPostsInput!
+}
+
 input PostCreateWithoutBoardInput {
+  author: UserCreateOneWithoutPostsInput!
   title: String!
   content: String!
   image: String!
@@ -378,14 +417,8 @@ input PostSubscriptionWhereInput {
   NOT: [PostSubscriptionWhereInput!]
 }
 
-input PostUpdateDataInput {
-  title: String
-  content: String
-  image: String
-  board: BoardUpdateOneRequiredWithoutPostsInput
-}
-
 input PostUpdateInput {
+  author: UserUpdateOneRequiredWithoutPostsInput
   title: String
   content: String
   image: String
@@ -398,21 +431,21 @@ input PostUpdateManyDataInput {
   image: String
 }
 
-input PostUpdateManyInput {
-  create: [PostCreateInput!]
-  update: [PostUpdateWithWhereUniqueNestedInput!]
-  upsert: [PostUpsertWithWhereUniqueNestedInput!]
-  delete: [PostWhereUniqueInput!]
-  connect: [PostWhereUniqueInput!]
-  disconnect: [PostWhereUniqueInput!]
-  deleteMany: [PostScalarWhereInput!]
-  updateMany: [PostUpdateManyWithWhereNestedInput!]
-}
-
 input PostUpdateManyMutationInput {
   title: String
   content: String
   image: String
+}
+
+input PostUpdateManyWithoutAuthorInput {
+  create: [PostCreateWithoutAuthorInput!]
+  delete: [PostWhereUniqueInput!]
+  connect: [PostWhereUniqueInput!]
+  disconnect: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
+  deleteMany: [PostScalarWhereInput!]
+  updateMany: [PostUpdateManyWithWhereNestedInput!]
 }
 
 input PostUpdateManyWithoutBoardInput {
@@ -431,15 +464,23 @@ input PostUpdateManyWithWhereNestedInput {
   data: PostUpdateManyDataInput!
 }
 
+input PostUpdateWithoutAuthorDataInput {
+  title: String
+  content: String
+  image: String
+  board: BoardUpdateOneRequiredWithoutPostsInput
+}
+
 input PostUpdateWithoutBoardDataInput {
+  author: UserUpdateOneRequiredWithoutPostsInput
   title: String
   content: String
   image: String
 }
 
-input PostUpdateWithWhereUniqueNestedInput {
+input PostUpdateWithWhereUniqueWithoutAuthorInput {
   where: PostWhereUniqueInput!
-  data: PostUpdateDataInput!
+  data: PostUpdateWithoutAuthorDataInput!
 }
 
 input PostUpdateWithWhereUniqueWithoutBoardInput {
@@ -447,10 +488,10 @@ input PostUpdateWithWhereUniqueWithoutBoardInput {
   data: PostUpdateWithoutBoardDataInput!
 }
 
-input PostUpsertWithWhereUniqueNestedInput {
+input PostUpsertWithWhereUniqueWithoutAuthorInput {
   where: PostWhereUniqueInput!
-  update: PostUpdateDataInput!
-  create: PostCreateInput!
+  update: PostUpdateWithoutAuthorDataInput!
+  create: PostCreateWithoutAuthorInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutBoardInput {
@@ -577,12 +618,28 @@ type UserConnection {
 input UserCreateInput {
   userName: String!
   password: String!
-  posts: PostCreateManyInput
+  posts: PostCreateManyWithoutAuthorInput
   permissions: UserCreatepermissionsInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutPostsInput {
+  create: UserCreateWithoutPostsInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreatepermissionsInput {
   set: [Permission!]
+}
+
+input UserCreateWithoutPostsInput {
+  userName: String!
+  password: String!
+  permissions: UserCreatepermissionsInput
 }
 
 type UserEdge {
@@ -624,10 +681,17 @@ input UserSubscriptionWhereInput {
   NOT: [UserSubscriptionWhereInput!]
 }
 
+input UserUpdateDataInput {
+  userName: String
+  password: String
+  posts: PostUpdateManyWithoutAuthorInput
+  permissions: UserUpdatepermissionsInput
+}
+
 input UserUpdateInput {
   userName: String
   password: String
-  posts: PostUpdateManyInput
+  posts: PostUpdateManyWithoutAuthorInput
   permissions: UserUpdatepermissionsInput
 }
 
@@ -637,8 +701,38 @@ input UserUpdateManyMutationInput {
   permissions: UserUpdatepermissionsInput
 }
 
+input UserUpdateOneRequiredInput {
+  create: UserCreateInput
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
+  connect: UserWhereUniqueInput
+}
+
+input UserUpdateOneRequiredWithoutPostsInput {
+  create: UserCreateWithoutPostsInput
+  update: UserUpdateWithoutPostsDataInput
+  upsert: UserUpsertWithoutPostsInput
+  connect: UserWhereUniqueInput
+}
+
 input UserUpdatepermissionsInput {
   set: [Permission!]
+}
+
+input UserUpdateWithoutPostsDataInput {
+  userName: String
+  password: String
+  permissions: UserUpdatepermissionsInput
+}
+
+input UserUpsertNestedInput {
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
+}
+
+input UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput!
+  create: UserCreateWithoutPostsInput!
 }
 
 input UserWhereInput {

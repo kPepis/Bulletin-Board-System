@@ -4,7 +4,7 @@ type Mutation {
   createUser(userName: String!, password: String!): User!
   signUp(userName: String!, password: String!): User!
   signIn(userName: String!, password: String!): User!
-  createBoard(name: String!, description: String!): Board!
+  createBoard(name: String!, description: String!, userName: String!): Board!
   createPost(
     title: String!
     content: String!
