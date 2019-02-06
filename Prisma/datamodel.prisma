@@ -11,6 +11,7 @@ type Board {
   name: String! @unique
   description: String!
   posts: [Post!]! @relation(name: "BoardPosts", link: INLINE)
+  usersOnline: [User!]! @relation(name: "UsersBrowsingBoard", link: INLINE)
   createdBy: User! @relation(name: "BoardCreator", link: INLINE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt

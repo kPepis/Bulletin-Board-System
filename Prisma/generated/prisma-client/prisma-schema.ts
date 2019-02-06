@@ -19,6 +19,7 @@ type Board {
   name: String!
   description: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  usersOnline(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   createdBy: User!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -34,6 +35,7 @@ input BoardCreateInput {
   name: String!
   description: String!
   posts: PostCreateManyWithoutBoardInput
+  usersOnline: UserCreateManyInput
   createdBy: UserCreateOneInput!
 }
 
@@ -45,6 +47,7 @@ input BoardCreateOneWithoutPostsInput {
 input BoardCreateWithoutPostsInput {
   name: String!
   description: String!
+  usersOnline: UserCreateManyInput
   createdBy: UserCreateOneInput!
 }
 
@@ -96,6 +99,7 @@ input BoardUpdateInput {
   name: String
   description: String
   posts: PostUpdateManyWithoutBoardInput
+  usersOnline: UserUpdateManyInput
   createdBy: UserUpdateOneRequiredInput
 }
 
@@ -114,6 +118,7 @@ input BoardUpdateOneRequiredWithoutPostsInput {
 input BoardUpdateWithoutPostsDataInput {
   name: String
   description: String
+  usersOnline: UserUpdateManyInput
   createdBy: UserUpdateOneRequiredInput
 }
 
@@ -622,6 +627,11 @@ input UserCreateInput {
   permissions: UserCreatepermissionsInput
 }
 
+input UserCreateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
 input UserCreateOneInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
@@ -663,6 +673,54 @@ type UserPreviousValues {
   permissions: [Permission!]!
 }
 
+input UserScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  userName: String
+  userName_not: String
+  userName_in: [String!]
+  userName_not_in: [String!]
+  userName_lt: String
+  userName_lte: String
+  userName_gt: String
+  userName_gte: String
+  userName_contains: String
+  userName_not_contains: String
+  userName_starts_with: String
+  userName_not_starts_with: String
+  userName_ends_with: String
+  userName_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  AND: [UserScalarWhereInput!]
+  OR: [UserScalarWhereInput!]
+  NOT: [UserScalarWhereInput!]
+}
+
 type UserSubscriptionPayload {
   mutation: MutationType!
   node: User
@@ -695,10 +753,32 @@ input UserUpdateInput {
   permissions: UserUpdatepermissionsInput
 }
 
+input UserUpdateManyDataInput {
+  userName: String
+  password: String
+  permissions: UserUpdatepermissionsInput
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  update: [UserUpdateWithWhereUniqueNestedInput!]
+  upsert: [UserUpsertWithWhereUniqueNestedInput!]
+  delete: [UserWhereUniqueInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  deleteMany: [UserScalarWhereInput!]
+  updateMany: [UserUpdateManyWithWhereNestedInput!]
+}
+
 input UserUpdateManyMutationInput {
   userName: String
   password: String
   permissions: UserUpdatepermissionsInput
+}
+
+input UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput!
+  data: UserUpdateManyDataInput!
 }
 
 input UserUpdateOneRequiredInput {
@@ -725,6 +805,11 @@ input UserUpdateWithoutPostsDataInput {
   permissions: UserUpdatepermissionsInput
 }
 
+input UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
 input UserUpsertNestedInput {
   update: UserUpdateDataInput!
   create: UserCreateInput!
@@ -733,6 +818,12 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutPostsInput {
   update: UserUpdateWithoutPostsDataInput!
   create: UserCreateWithoutPostsInput!
+}
+
+input UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserWhereInput {

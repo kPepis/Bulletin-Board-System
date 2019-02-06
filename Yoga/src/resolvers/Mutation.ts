@@ -97,6 +97,7 @@ const Mutation: Record<string, GraphQL.Mutation> = {
 
   async createPost(parent, args, ctx, info) {
     const { title, content, boardId, image } = args;
+    // todo fix input for creating a post
     // return await ctx.db.createPost({
     //   title,
     //   content,
@@ -105,6 +106,32 @@ const Mutation: Record<string, GraphQL.Mutation> = {
     //   },
     //   image,
     // });
+  },
+
+  async addOnlineUser(parent, args, ctx, info) {
+    const { boardId, userName } = args;
+
+    return await ctx.db.updateBoard({
+      where: { id: boardId },
+      data: {
+        usersOnline: {
+          connect: { userName },
+        },
+      },
+    });
+  },
+  
+  async removeOnlineUser(parent, args, ctx, info) {
+    const { boardId, userName } = args;
+
+    return await ctx.db.updateBoard({
+      where: { id: boardId },
+      data: {
+        usersOnline: {
+          disconnect: { userName },
+        },
+      },
+    });
   },
 };
 

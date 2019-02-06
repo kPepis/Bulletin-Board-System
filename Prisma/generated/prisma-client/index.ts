@@ -200,6 +200,14 @@ export type Permission =
   | "POSTDELETE"
   | "PERMISSIONUPDATE";
 
+export type UserOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "userName_ASC"
+  | "userName_DESC"
+  | "password_ASC"
+  | "password_DESC";
+
 export type BoardOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -211,14 +219,6 @@ export type BoardOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
-
-export type UserOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "userName_ASC"
-  | "userName_DESC"
-  | "password_ASC"
-  | "password_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -305,6 +305,54 @@ export interface PostWhereInput {
   NOT?: PostWhereInput[] | PostWhereInput;
 }
 
+export interface UserWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  userName?: String;
+  userName_not?: String;
+  userName_in?: String[] | String;
+  userName_not_in?: String[] | String;
+  userName_lt?: String;
+  userName_lte?: String;
+  userName_gt?: String;
+  userName_gte?: String;
+  userName_contains?: String;
+  userName_not_contains?: String;
+  userName_starts_with?: String;
+  userName_not_starts_with?: String;
+  userName_ends_with?: String;
+  userName_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  AND?: UserWhereInput[] | UserWhereInput;
+  OR?: UserWhereInput[] | UserWhereInput;
+  NOT?: UserWhereInput[] | UserWhereInput;
+}
+
 export interface BoardWhereInput {
   id?: ID_Input;
   id_not?: ID_Input;
@@ -378,58 +426,11 @@ export type UserWhereUniqueInput = AtLeastOne<{
   userName?: String;
 }>;
 
-export interface UserWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  userName?: String;
-  userName_not?: String;
-  userName_in?: String[] | String;
-  userName_not_in?: String[] | String;
-  userName_lt?: String;
-  userName_lte?: String;
-  userName_gt?: String;
-  userName_gte?: String;
-  userName_contains?: String;
-  userName_not_contains?: String;
-  userName_starts_with?: String;
-  userName_not_starts_with?: String;
-  userName_ends_with?: String;
-  userName_not_ends_with?: String;
-  password?: String;
-  password_not?: String;
-  password_in?: String[] | String;
-  password_not_in?: String[] | String;
-  password_lt?: String;
-  password_lte?: String;
-  password_gt?: String;
-  password_gte?: String;
-  password_contains?: String;
-  password_not_contains?: String;
-  password_starts_with?: String;
-  password_not_starts_with?: String;
-  password_ends_with?: String;
-  password_not_ends_with?: String;
-  AND?: UserWhereInput[] | UserWhereInput;
-  OR?: UserWhereInput[] | UserWhereInput;
-  NOT?: UserWhereInput[] | UserWhereInput;
-}
-
 export interface BoardCreateInput {
   name: String;
   description: String;
   posts?: PostCreateManyWithoutBoardInput;
+  usersOnline?: UserCreateManyInput;
   createdBy: UserCreateOneInput;
 }
 
@@ -460,9 +461,9 @@ export interface UserCreatepermissionsInput {
   set?: Permission[] | Permission;
 }
 
-export interface UserCreateOneInput {
-  create?: UserCreateInput;
-  connect?: UserWhereUniqueInput;
+export interface UserCreateManyInput {
+  create?: UserCreateInput[] | UserCreateInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
 }
 
 export interface UserCreateInput {
@@ -492,13 +493,20 @@ export interface BoardCreateOneWithoutPostsInput {
 export interface BoardCreateWithoutPostsInput {
   name: String;
   description: String;
+  usersOnline?: UserCreateManyInput;
   createdBy: UserCreateOneInput;
+}
+
+export interface UserCreateOneInput {
+  create?: UserCreateInput;
+  connect?: UserWhereUniqueInput;
 }
 
 export interface BoardUpdateInput {
   name?: String;
   description?: String;
   posts?: PostUpdateManyWithoutBoardInput;
+  usersOnline?: UserUpdateManyInput;
   createdBy?: UserUpdateOneRequiredInput;
 }
 
@@ -648,11 +656,26 @@ export interface PostUpdateManyDataInput {
   image?: String;
 }
 
-export interface UserUpdateOneRequiredInput {
-  create?: UserCreateInput;
-  update?: UserUpdateDataInput;
-  upsert?: UserUpsertNestedInput;
-  connect?: UserWhereUniqueInput;
+export interface UserUpdateManyInput {
+  create?: UserCreateInput[] | UserCreateInput;
+  update?:
+    | UserUpdateWithWhereUniqueNestedInput[]
+    | UserUpdateWithWhereUniqueNestedInput;
+  upsert?:
+    | UserUpsertWithWhereUniqueNestedInput[]
+    | UserUpsertWithWhereUniqueNestedInput;
+  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  deleteMany?: UserScalarWhereInput[] | UserScalarWhereInput;
+  updateMany?:
+    | UserUpdateManyWithWhereNestedInput[]
+    | UserUpdateManyWithWhereNestedInput;
+}
+
+export interface UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateDataInput;
 }
 
 export interface UserUpdateDataInput {
@@ -701,7 +724,20 @@ export interface BoardUpdateOneRequiredWithoutPostsInput {
 export interface BoardUpdateWithoutPostsDataInput {
   name?: String;
   description?: String;
+  usersOnline?: UserUpdateManyInput;
   createdBy?: UserUpdateOneRequiredInput;
+}
+
+export interface UserUpdateOneRequiredInput {
+  create?: UserCreateInput;
+  update?: UserUpdateDataInput;
+  upsert?: UserUpsertNestedInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
 }
 
 export interface BoardUpsertWithoutPostsInput {
@@ -715,9 +751,69 @@ export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
   create: PostCreateWithoutAuthorInput;
 }
 
-export interface UserUpsertNestedInput {
+export interface UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
   update: UserUpdateDataInput;
   create: UserCreateInput;
+}
+
+export interface UserScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  userName?: String;
+  userName_not?: String;
+  userName_in?: String[] | String;
+  userName_not_in?: String[] | String;
+  userName_lt?: String;
+  userName_lte?: String;
+  userName_gt?: String;
+  userName_gte?: String;
+  userName_contains?: String;
+  userName_not_contains?: String;
+  userName_starts_with?: String;
+  userName_not_starts_with?: String;
+  userName_ends_with?: String;
+  userName_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  AND?: UserScalarWhereInput[] | UserScalarWhereInput;
+  OR?: UserScalarWhereInput[] | UserScalarWhereInput;
+  NOT?: UserScalarWhereInput[] | UserScalarWhereInput;
+}
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface UserUpdateManyDataInput {
+  userName?: String;
+  password?: String;
+  permissions?: UserUpdatepermissionsInput;
 }
 
 export interface BoardUpdateManyMutationInput {
@@ -818,6 +914,15 @@ export interface BoardPromise extends Promise<Board>, Fragmentable {
     first?: Int;
     last?: Int;
   }) => T;
+  usersOnline: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
   createdBy: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -832,6 +937,15 @@ export interface BoardSubscription
   posts: <T = Promise<AsyncIterator<PostSubscription>>>(args?: {
     where?: PostWhereInput;
     orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  usersOnline: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;

@@ -5,8 +5,6 @@ import { NextContext } from "next";
 import React, { Component } from "react";
 import { Mutation, MutationFn } from "react-apollo";
 
-import { BoardCreateInput } from "../../Prisma/generated/prisma-client";
-import { perPage } from "../config";
 import { CREATE_BOARD_MUTATION } from "../graphql/mutations";
 import { GET_BOARDS_QUERY } from "../graphql/queries";
 

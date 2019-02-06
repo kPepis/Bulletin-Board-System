@@ -104,3 +104,4 @@ class MyApp extends App<IProps, IState> {
 
 // export default withRedux(initStore)(MyApp);
 export default withRedux(initStore)(withData(MyApp));
+// export default withData(MyApp);

@@ -23,3 +23,32 @@ export const PAGINATION_QUERY = gql`
     }
   }
 `;
+
+export const SINGLE_BOARD_QUERY = gql`
+  query SINGLE_BOARD_QUERY($id: ID!) {
+    board(where: { id: $id }) {
+      id
+      name
+      description
+      posts {
+        id
+        title
+        content
+        image
+      }
+      usersOnline {
+        userName
+      }
+    }
+  }
+`;
+
+export const BOARD_ONLINE_USERS_QUERY = gql`
+  query BOARD_ONLINE_USERS_QUERY($id: ID!) {
+    board(where: { id: $id }) {
+      usersOnline {
+        userName
+      }
+    }
+  }
+`;

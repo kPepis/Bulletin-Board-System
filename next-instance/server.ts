@@ -17,9 +17,10 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
-interface boardData {
+interface boardConnectEvent {
   boardId: string;
   socketId: string;
+  userName: string;
 }
 
 declare global {
@@ -36,7 +37,6 @@ app.use(cookieParser());
 
 app.use((req: Request, _res: Response, next: NextFunction) => {
   const { token } = req.cookies;
-  console.log(token);
   if (token) {
     const { userId, userName } = jwt.verify(token, process.env.APP_SECRET!) as {
       userId: string;
@@ -55,7 +55,7 @@ io.on("connection", (_socket: Socket) => {
     console.log("User has disconnected");
   });
 
-  _socket.on("board connect", (data: boardData) => {
+  _socket.on("board connect", (data: boardConnectEvent) => {
     const { boardId } = data;
     _socket.join(boardId);
     _socket.to(boardId).broadcast.emit("user connect");

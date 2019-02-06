@@ -1,11 +1,12 @@
 import cookieParser from "cookie-parser";
-import { execute, subscribe, GraphQLSchema, buildSchema } from "graphql";
+import { readFileSync } from "fs";
+import { buildSchema, execute, subscribe } from "graphql";
 import jwt from "jsonwebtoken";
 import { SubscriptionServer } from "subscriptions-transport-ws";
-import Mutation from "./resolvers/Mutation";
-import Query from "./resolvers/Query";
+import bodyParser from "body-parser";
+
 import createServer from "./createServer";
-import { readFileSync } from "fs";
+
 // import * as schema from "./generated/prisma-client/prisma-schema";
 
 const server = createServer();

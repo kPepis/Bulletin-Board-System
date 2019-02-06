@@ -11,6 +11,8 @@ type Mutation {
     boardId: String!
     image: String!
   ): Post!
+  addOnlineUser(userName: String!, boardId: String!): Board
+  removeOnlineUser(userName: String!, boardId: String!): Board
 }
 
 type Query {
@@ -25,7 +27,7 @@ type Query {
     first: Int
     last: Int
   ): [Board]!
-  board(where: BoardWhereUniqueInput!): Board
+  board(where: BoardWhereUniqueInput!): Board!
   boardsConnection(where: BoardWhereInput): BoardConnection!
 
   posts: [Post]!

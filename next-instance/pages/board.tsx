@@ -1,6 +1,5 @@
-import { Affix, Button, List, Modal, message } from "antd";
+import { Affix, Button, List, message, Modal } from "antd";
 import { FormComponentProps } from "antd/lib/form";
-import gql from "graphql-tag";
 import { NextContext } from "next";
 import Head from "next/head";
 import React, { Component } from "react";
@@ -12,6 +11,11 @@ import { bindActionCreators } from "redux";
 
 import Post, { PostProps } from "../components/Post";
 import PostForm from "../components/PostForm";
+import { ADD_ONLINE_USER, CREATE_POST_MUTATION } from "../graphql/mutations";
+import {
+  BOARD_ONLINE_USERS_QUERY,
+  SINGLE_BOARD_QUERY,
+} from "../graphql/queries";
 import { updateAnnouncement } from "../lib/states/announcement/actions";
 
 interface SingleBoardProps {
@@ -41,41 +45,6 @@ interface PostFormFields {
   postContent: string;
 }
 
-const SINGLE_BOARD_QUERY = gql`
-  query SINGLE_BOARD_QUERY($id: ID!) {
-    board(where: { id: $id }) {
-      id
-      name
-      description
-      posts {
-        id
-        title
-        content
-        image
-      }
-    }
-  }
-`;
-
-const CREATE_POST_MUTATION = gql`
-  mutation CREATE_POST_MUTATION(
-    $title: String!
-    $content: String!
-    $boardId: String!
-    $image: String!
-  ) {
-    createPost(
-      title: $title
-      content: $content
-      boardId: $boardId
-      image: $image
-    ) {
-      title
-      content
-    }
-  }
-`;
-
 class Board extends Component<SingleBoardProps, SingleBoardState> {
   static async getInitialProps(ctx: NextContext) {
     const { query, req } = ctx;
@@ -92,17 +61,22 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
   componentDidMount(): void {
     const socket = this.props.socket;
     const id = this.props.query.id;
-    socket.emit("board connect", { boardId: id, socketId: socket.id });
+    const userName = this.props.userName;
+
+    socket.emit("board connect", {
+      boardId: id,
+      socketId: socket.id,
+      userName,
+    });
 
     socket.on("user connect", () => {
       // todo change this.props.userName to the connecting userName
-      message.info(`User ${this.props.userName} is now seeing this board`);
+      message.info(`User ${userName} is now seeing this board`);
       console.log("A new user is seeing this board");
     });
   }
 
   showModal: () => void = () => {
-    // this.props.updateAnnouncement("Announcement changed!");
     this.setState({ modalVisible: true });
   };
 
@@ -132,13 +106,6 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
         <Button type="primary" onClick={this.showModal} htmlType="button">
           Publish new post
         </Button>
-        {/*<Websocket*/}
-        {/*url="ws://localhost:3000/socket.io/?EIO=3&transport=websocket"*/}
-        {/*onMessage={(data: any) => console.log(data)}*/}
-        {/*onOpen={() => console.log("WS open")}*/}
-        {/*onClose={() => console.log("WS close")}*/}
-        {/*debug={true}*/}
-        {/*/>*/}
       </Affix>
     );
 
@@ -154,6 +121,8 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
               );
             if (loading)
               return <PacmanLoader loading={loading} color={"black"} />;
+
+            console.log(data.board);
 
             const posts: PostProps = data.board.posts;
 
@@ -172,6 +141,8 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
                     <Post {...post} key={post.id} />
                   )}
                 />
+
+                <p>Currently logged in users: {data.board.usersOnline[0].userName}</p>
               </>
             );
           }}

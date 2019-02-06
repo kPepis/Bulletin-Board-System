@@ -12,6 +12,7 @@ export default function createServer(): GraphQLServer {
       Query,
       Board: {
         posts: parent => db.board({ id: parent.id }).posts(),
+        usersOnline: parent => db.board({ id: parent.id }).usersOnline(),
       },
       Post: {
         board: parent => db.post({ id: parent.id }).board(),
