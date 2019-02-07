@@ -7,6 +7,7 @@ const lessToJS = require("less-vars-to-js");
 const fs = require("fs");
 const path = require("path");
 const cssLoaderConfig = require("@zeit/next-css/css-loader-config");
+const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
 
 // Where your antd-custom.less file lives
 // const themeVariables = lessToJS(
@@ -48,6 +49,16 @@ module.exports = withPlugins(
     [withSass, sassConfig],
     [withCSS, cssConfig],
     [withLess, lessConfig],
+    [
+      new ExtractCssChunks({
+        filename: "[name.css]",
+        chunkFilename: "[id].css",
+        hot: true,
+        orderWarning: true,
+        reloadAll: true,
+        cssModules: true,
+      }),
+    ],
   ],
   {
     webpack: (config, options) => {
@@ -56,6 +67,11 @@ module.exports = withPlugins(
       config.node = {
         fs: "empty",
       };
+
+      config.module.rules.push({
+        test: /`.css$/,
+        use: [ExtractCssChunks.loader, "css-loader"],
+      });
 
       // config.module.rules.push({
       //   test: /\.less$/,
@@ -76,7 +92,8 @@ module.exports = withPlugins(
       //     javascriptEnabled: true,
       //     loaders: [
       //       {
-      //         loader: "less-loader",
+      //         // loader: "less-loader",
+      //         loader: MiniCssExtractPlugin.loader,
       //         options: lessConfig.lessLoaderOptions,
       //       },
       //     ],

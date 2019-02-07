@@ -34,7 +34,7 @@ export const CREATE_POST_MUTATION = gql`
 `;
 
 export const ADD_ONLINE_USER = gql`
-  mutation ADD_ONLINE_USER($userName: userName, $boardId: boardId) {
+  mutation ADD_ONLINE_USER($userName: String!, $boardId: String!) {
     addOnlineUser(userName: $userName, boardId: $boardId) {
       usersOnline {
         userName
@@ -44,7 +44,7 @@ export const ADD_ONLINE_USER = gql`
 `;
 
 export const REMOVE_ONLINE_USER = gql`
-  mutation REMOVE_ONLINE_USER($userName: userName, $boardId: boardId) {
+  mutation REMOVE_ONLINE_USER($userName: String!, $boardId: String!) {
     removeOnlineUser(userName: $userName, boardId: $boardId) {
       usersOnline {
         userName

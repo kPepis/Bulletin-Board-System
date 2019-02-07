@@ -1,4 +1,4 @@
-import { Affix, Button, List, message, Modal } from "antd";
+import { Affix, Button, Icon, List, message, Modal } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import { NextContext } from "next";
 import Head from "next/head";
@@ -8,15 +8,12 @@ import CanvasDraw, { DrawingCanvas } from "react-canvas-draw";
 import { connect } from "react-redux";
 import { PacmanLoader } from "react-spinners";
 import { bindActionCreators } from "redux";
+import { addOnlineUser } from "../actions";
 
 import Post, { PostProps } from "../components/Post";
 import PostForm from "../components/PostForm";
-import { ADD_ONLINE_USER, CREATE_POST_MUTATION } from "../graphql/mutations";
-import {
-  BOARD_ONLINE_USERS_QUERY,
-  SINGLE_BOARD_QUERY,
-} from "../graphql/queries";
-import { updateAnnouncement } from "../lib/states/announcement/actions";
+import { CREATE_POST_MUTATION } from "../graphql/mutations";
+import { SINGLE_BOARD_QUERY } from "../graphql/queries";
 
 interface SingleBoardProps {
   socket: SocketIOClient.Socket;
@@ -69,11 +66,16 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
       userName,
     });
 
-    socket.on("user connect", () => {
-      // todo change this.props.userName to the connecting userName
-      message.info(`User ${userName} is now seeing this board`);
-      console.log("A new user is seeing this board");
+    socket.on("user connect", (incomingUser: { userName: string }) => {
+      message.info(`User ${incomingUser.userName} is now seeing this board`);
     });
+
+    if (this.props.userName) {
+      this.props.addOnlineUser({ userName: this.props.userName });
+    }
+
+    console.log(this.props.onlineUsers);
+    // this.props.addOnlineUser()
   }
 
   showModal: () => void = () => {
@@ -99,6 +101,8 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
   }
 
   render() {
+    console.log(this.props);
+
     const id = this.props.query.id;
 
     const listFooter = (
@@ -122,8 +126,6 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
             if (loading)
               return <PacmanLoader loading={loading} color={"black"} />;
 
-            console.log(data.board);
-
             const posts: PostProps = data.board.posts;
 
             return (
@@ -142,15 +144,44 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
                   )}
                 />
 
-                <p>Currently logged in users: {data.board.usersOnline[0].userName}</p>
+                <p>
+                  <Icon type="contacts" theme="twoTone" /> Currently logged in
+                  users: {/*{data.board.usersOnline[0].userName}*/}
+                  {(this.props.onlineUsers as Array<any>).map(
+                    user => `${user}, `,
+                  )}
+                  {/*{(data.board.usersOnline as Array<any>).map(*/}
+                  {/*user => `${user.userName}, `,*/}
+                  {/*)}*/}
+                </p>
               </>
             );
           }}
         </Query>
 
+        {/*<Mutation*/}
+        {/*mutation={ADD_ONLINE_USER}*/}
+        {/*refetchQueries={[{ query: SINGLE_BOARD_QUERY, variables: { id } }]}*/}
+        {/*>*/}
+        {/*{(addOnlineUser, _) => {*/}
+        {/*if (this.props.userName) {*/}
+        {/*addOnlineUser({*/}
+        {/*variables: { boardId: id, userName: this.props.userName },*/}
+        {/*});*/}
+        {/*}*/}
+
+        {/*return null;*/}
+        {/*}}*/}
+        {/*</Mutation>*/}
+
         <Mutation
           mutation={CREATE_POST_MUTATION}
-          refetchQueries={[{ query: SINGLE_BOARD_QUERY, variables: { id } }]}
+          refetchQueries={[
+            {
+              query: SINGLE_BOARD_QUERY,
+              variables: { id, userName: this.props.userName },
+            },
+          ]}
         >
           {(createPost, { loading }) => (
             <Modal
@@ -199,13 +230,13 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
   }
 }
 
-const mapStateToProps = state => ({
-  announcementMessage: state.announcement.message,
-});
+const mapStateToProps = state => {
+  return { onlineUsers: state.onlineUsers };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateAnnouncement: bindActionCreators(updateAnnouncement, dispatch),
+    addOnlineUser: bindActionCreators(addOnlineUser, dispatch),
   };
 };
 

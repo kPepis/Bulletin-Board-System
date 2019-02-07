@@ -17,6 +17,9 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
+// const onlineUsers: { boardId: string; users: string[] }[] = [];
+// const onlineUsers: Set<{ boardId: string; users: string[] }> = new Set();
+
 interface boardConnectEvent {
   boardId: string;
   socketId: string;
@@ -56,9 +59,9 @@ io.on("connection", (_socket: Socket) => {
   });
 
   _socket.on("board connect", (data: boardConnectEvent) => {
-    const { boardId } = data;
+    const { boardId, userName } = data;
     _socket.join(boardId);
-    _socket.to(boardId).broadcast.emit("user connect");
+    _socket.to(boardId).broadcast.emit("user connect", { userName });
     console.log(`Socket ${data.socketId} has entered board ${boardId}.`);
   });
 

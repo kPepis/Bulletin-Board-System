@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { forwardTo } from "prisma-binding";
 
 import { GraphQL } from "../../types/graphql-interfaces";
 
@@ -96,16 +97,26 @@ const Mutation: Record<string, GraphQL.Mutation> = {
   },
 
   async createPost(parent, args, ctx, info) {
+    const isUserLoggedIn = !!ctx.request.userId;
+
+    if (!isUserLoggedIn) {
+      throw new Error("User not logged in");
+    }
+
     const { title, content, boardId, image } = args;
-    // todo fix input for creating a post
-    // return await ctx.db.createPost({
-    //   title,
-    //   content,
-    //   board: {
-    //     connect: { id: boardId },
-    //   },
-    //   image,
-    // });
+    return await ctx.db.createPost({
+      title,
+      content,
+      board: {
+        connect: { id: boardId },
+      },
+      image,
+      author: {
+        connect: {
+          id: ctx.request.userId,
+        },
+      },
+    });
   },
 
   async addOnlineUser(parent, args, ctx, info) {
@@ -120,7 +131,7 @@ const Mutation: Record<string, GraphQL.Mutation> = {
       },
     });
   },
-  
+
   async removeOnlineUser(parent, args, ctx, info) {
     const { boardId, userName } = args;
 
@@ -133,6 +144,8 @@ const Mutation: Record<string, GraphQL.Mutation> = {
       },
     });
   },
+
+  updateBoard: forwardTo("db"),
 };
 
 export default Mutation;
