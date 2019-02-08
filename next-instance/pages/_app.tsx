@@ -1,10 +1,10 @@
-import "../lib/dummy.css";
-import "../lib/dummy.less";
-
-import { Icon, Layout, Menu } from "antd";
+import { Layout, Menu } from "antd";
+import "antd/dist/antd.css";
 import { ApolloClient } from "apollo-boost";
+import withRedux from "next-redux-wrapper";
 import App, { Container, NextAppContext } from "next/app";
 import Link from "next/link";
+import Router from "next/router";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
 import { Provider } from "react-redux";
@@ -13,7 +13,33 @@ import io from "socket.io-client";
 
 import withData from "../lib/withData";
 import initStore from "../lib/withReduxSaga";
-import withRedux from "next-redux-wrapper";
+
+Router.onRouteChangeComplete = () => {
+  if (process.env.NODE_ENV !== "production") {
+    const els = document.querySelectorAll(
+      'link[href*="/_next/static/css/styles.chunk.css"]',
+    );
+    const timestamp = new Date().valueOf();
+    els[0].href = "/_next/static/css/styles.chunk.css?v=" + timestamp;
+  }
+};
+
+// HACK: Reload CSS in development
+//       Remove when this issue is resolved:
+//       https://github.com/zeit/next-plugins/issues/282
+function initializeCssHack() {
+  if (process.env.NODE_ENV == "production") return;
+  const href = "/_next/static/css/styles.chunk.css";
+  Router.events.on("routeChangeComplete", () => {
+    const css = document.querySelector(`link[href^="${href}"]`);
+    const newCss = css.cloneNode();
+    newCss.href = `${href}?c=${Date.now()}`;
+    newCss.onload = () => css.remove();
+    css.parentNode.appendChild(newCss);
+  });
+}
+
+initializeCssHack();
 
 const { Sider, Content } = Layout;
 
@@ -44,22 +70,6 @@ class MyApp extends App<IProps, IState> {
     socket: io(),
   };
 
-  componentDidMount() {
-    // connect to WS server and listen event
-    // const socket = io();
-    // this.setState({ socket });
-    this.state.socket.emit("userConnection");
-  }
-
-  componentDidUpdate() {}
-
-  // close socket connection
-  componentWillUnmount() {
-    this.state.socket.off("userConnection");
-    console.log("A user has disconnected");
-    this.state.socket.close();
-  }
-
   render() {
     const { Component, pageProps, apollo, store } = this.props;
     return (
@@ -71,15 +81,30 @@ class MyApp extends App<IProps, IState> {
                 <div className="logo" />
                 <Menu theme="dark" mode="inline">
                   <Menu.Item>
-                    <Icon type="user" />
-                    <span>My profile</span>
+                    {pageProps.userName ? (
+                      <Link href="/me">
+                        <a>My profile</a>
+                      </Link>
+                    ) : (
+                      <Link href="/login">
+                        <a>Login</a>
+                      </Link>
+                    )}
                   </Menu.Item>
 
-                  <Menu.Item>
-                    <Link href="/">
-                      <a>Registration</a>
-                    </Link>
-                  </Menu.Item>
+                  {!pageProps.userName ? (
+                    <Menu.Item>
+                      <Link href="/">
+                        <a>Sign up</a>
+                      </Link>
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item>
+                      <Link href="/logout">
+                        <a>Log out</a>
+                      </Link>
+                    </Menu.Item>
+                  )}
 
                   <Menu.Item>
                     <Link href="/boards">

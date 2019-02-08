@@ -3,9 +3,9 @@ const next = require("next");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 
+import { NextFunction } from "express-serve-static-core";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "socket.io";
-import { NextFunction } from "express-serve-static-core";
 
 const app = express();
 
@@ -17,8 +17,9 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
-// const onlineUsers: { boardId: string; users: string[] }[] = [];
-// const onlineUsers: Set<{ boardId: string; users: string[] }> = new Set();
+const onlineUsers: {
+  [index: string]: Set<string>;
+} = {};
 
 interface boardConnectEvent {
   boardId: string;
@@ -53,20 +54,49 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
   next();
 });
 
-io.on("connection", (_socket: Socket) => {
+io.on("connect", (_socket: Socket) => {
+  _socket.on(
+    "board disconnect",
+    (data: { userName: string; boardId: string }) => {
+      const { boardId, userName } = data;
+      console.log(`A user has left board ${boardId}`);
+      onlineUsers[boardId].delete(userName);
+
+      _socket.to(boardId).broadcast.emit("user disconnect", {
+        userName,
+        onlineUsers: Array.from(onlineUsers[boardId]),
+      });
+
+      console.log(onlineUsers[boardId]);
+    },
+  );
+
   _socket.on("disconnect", () => {
     console.log("User has disconnected");
+  });
+
+  _socket.on("new board connection", (data: { boardId: string }) => {
+    const { boardId } = data;
+    _socket.emit("fetch users", Array.from(onlineUsers[boardId]));
   });
 
   _socket.on("board connect", (data: boardConnectEvent) => {
     const { boardId, userName } = data;
     _socket.join(boardId);
-    _socket.to(boardId).broadcast.emit("user connect", { userName });
-    console.log(`Socket ${data.socketId} has entered board ${boardId}.`);
-  });
 
-  _socket.on("board disconnect", (boardId: string) => {
-    console.log(`A user has left board ${boardId}`);
+    // create a new set for a board if it doesn't exist
+    if (!onlineUsers[boardId]) {
+      onlineUsers[boardId] = new Set();
+    }
+    // add online user to boardId set structure
+    onlineUsers[boardId].add(userName);
+
+    _socket.to(boardId).broadcast.emit("user connect", {
+      userName,
+      onlineUsers: Array.from(onlineUsers[boardId]),
+    });
+
+    console.log(`Socket ${data.socketId} has entered board ${boardId}.`);
   });
 });
 

@@ -11,7 +11,7 @@ const AnimationWrapper = styled.div`
 
 export interface PostProps {
   id: string;
-  // author: string;
+  author: string;
   title: string;
   content: string;
   image: string;
@@ -22,23 +22,27 @@ export interface PostProps {
 
 export default class Post extends Component<PostProps> {
   render() {
-    const { id, title, content, image } = this.props;
+    const { author, title, content, image } = this.props;
     return (
       <AnimationWrapper>
         <List.Item
           extra={
-            <CanvasDraw
-              loadTimeOffset={20}
-              hideGrid
-              canvasWidth={150}
-              canvasHeight={150}
-              disabled
-              saveData={image}
-            />
+            <>
+              <CanvasDraw
+                loadTimeOffset={20}
+                hideGrid
+                canvasWidth={150}
+                canvasHeight={150}
+                disabled
+                saveData={image}
+              />
+            </>
           }
         >
           <List.Item.Meta
-            avatar={<Avatar src={`https://robohash.org/${id}`} />}
+            avatar={
+              <Avatar size={100} src={`https://robohash.org/${author}`} />
+            }
             title={title}
             description={content}
           />

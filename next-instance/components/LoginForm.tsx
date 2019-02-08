@@ -1,0 +1,188 @@
+import { Button, Col, Form, Icon, Input, Row, Tooltip } from "antd";
+import { ColProps } from "antd/lib/col";
+import { FormComponentProps } from "antd/lib/form";
+import gql from "graphql-tag";
+import Router from "next/router";
+import React, { Component } from "react";
+import { Mutation } from "react-apollo";
+
+export const SIGN_IN_MUTATION = gql`
+  mutation SIGN_IN_MUTATION($userName: String!, $password: String!) {
+    signIn(userName: $userName, password: $password) {
+      id
+      userName
+    }
+  }
+`;
+
+interface FormState {
+  isDirty: boolean;
+}
+
+class NormalLoginForm extends Component<FormComponentProps, FormState> {
+  state = {
+    isDirty: false,
+  };
+
+  onBlurHandler: React.FormEventHandler = e => {
+    const value = (e.target as HTMLInputElement).value;
+    this.setState({ isDirty: this.state.isDirty || !!value });
+  };
+
+  compareToFirstPassword = (_rule: any, value: any, callback: any): any => {
+    const form = this.props.form;
+    if (value !== form.getFieldValue("password")) {
+      callback("Passwords are not equal");
+    } else {
+      callback();
+    }
+  };
+
+  compareToSecondPassword = (_rule: any, value: any, callback: any): any => {
+    const form = this.props.form;
+    if (value && this.state.isDirty) {
+      form.validateFields(["passwordVerification"], { force: true });
+    }
+    callback();
+  };
+
+  render() {
+    const form = this.props.form;
+    const { getFieldDecorator } = this.props.form;
+
+    const colLayout: ColProps = {
+      xs: { span: 24 },
+      sm: { span: 15 },
+      md: { span: 8 },
+      lg: { span: 8 },
+      xl: { span: 6 },
+      xxl: { span: 4 },
+    };
+
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 24 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 24 },
+      },
+    };
+
+    return (
+      <Row type="flex" justify="center" align="middle">
+        <Col {...colLayout} className={"centered-col"}>
+          <Mutation mutation={SIGN_IN_MUTATION}>
+            {(signIn, { loading }) => (
+              <fieldset disabled={loading} aria-busy={loading}>
+                <Form
+                  onSubmit={e => {
+                    // Stop the form from submitting
+                    e.preventDefault();
+                    this.props.form.validateFields(async (err, values) => {
+                      if (!err) {
+                        // Call the mutation function
+                        // todo show in UI if user already exists
+                        const user = await signIn({
+                          variables: {
+                            ...form.getFieldsValue(["userName", "password"]),
+                          },
+                        });
+
+                        if (user) {
+                          await Router.push("/boards");
+                        }
+                      }
+                    });
+                  }}
+                  className={"form-container"}
+                  layout="vertical"
+                  hideRequiredMark={false}
+                >
+                  <Form.Item
+                    {...formItemLayout}
+                    label={
+                      <span>
+                        Username&nbsp;
+                        <Tooltip title="This is the name others users will see">
+                          <Icon type="question-circle-o" />
+                        </Tooltip>
+                      </span>
+                    }
+                  >
+                    {getFieldDecorator("userName", {
+                      rules: [
+                        {
+                          required: true,
+                          message: "Please type a non-empty username",
+                          whitespace: true,
+                          type: "string",
+                        },
+                      ],
+                    })(
+                      <Input
+                        allowClear={true}
+                        prefix={
+                          <Icon
+                            type="user"
+                            style={{ color: "rgba(0,0,0,.25)" }}
+                          />
+                        }
+                        placeholder="Enter a username"
+                        size={"large"}
+                      />,
+                    )}
+                  </Form.Item>
+
+                  <Form.Item {...formItemLayout} label="Password">
+                    {getFieldDecorator("password", {
+                      rules: [
+                        {
+                          required: true,
+                          message: "Please enter a password",
+                        },
+                        {
+                          validator: this.compareToSecondPassword,
+                        },
+                      ],
+                      validateTrigger: "onBlur",
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type="lock"
+                            style={{ color: "rgba(0,0,0,.25)" }}
+                          />
+                        }
+                        type="password"
+                        placeholder="Enter your password"
+                        size={"large"}
+                      />,
+                    )}
+                  </Form.Item>
+
+                  <Form.Item {...formItemLayout}>
+                    <Button
+                      size="large"
+                      type="primary"
+                      htmlType="submit"
+                      className="login-form-button"
+                      block={true}
+                    >
+                      Log in
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </fieldset>
+            )}
+          </Mutation>
+        </Col>
+      </Row>
+    );
+  }
+}
+
+const WrappedNormalLoginForm = Form.create({})(NormalLoginForm);
+
+export default WrappedNormalLoginForm;

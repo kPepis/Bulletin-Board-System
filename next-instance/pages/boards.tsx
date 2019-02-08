@@ -105,8 +105,12 @@ export default class Boards extends Component<BoardsProps> {
           }}
         </Query>
 
-        {/*todo render only if user is logged in*/}
-        <BoardsForm userName={this.props.userName!} userId={this.props.userId!} />
+        {this.props.userName && (
+          <BoardsForm
+            userName={this.props.userName!}
+            userId={this.props.userId!}
+          />
+        )}
       </>
     );
   }

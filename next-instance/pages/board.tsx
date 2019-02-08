@@ -42,6 +42,8 @@ interface PostFormFields {
   postContent: string;
 }
 
+let onlineUsers: Array<string> = [];
+
 class Board extends Component<SingleBoardProps, SingleBoardState> {
   static async getInitialProps(ctx: NextContext) {
     const { query, req } = ctx;
@@ -55,27 +57,54 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
     formValid: false,
   };
 
+  unloadHandler = () => {
+    this.props.socket.emit("board disconnect", {
+      boardId: this.props.query.id,
+      userName: this.props.userName || "",
+    });
+  };
+
   componentDidMount(): void {
     const socket = this.props.socket;
     const id = this.props.query.id;
     const userName = this.props.userName;
 
-    socket.emit("board connect", {
-      boardId: id,
-      socketId: socket.id,
-      userName,
-    });
-
-    socket.on("user connect", (incomingUser: { userName: string }) => {
-      message.info(`User ${incomingUser.userName} is now seeing this board`);
-    });
-
-    if (this.props.userName) {
-      this.props.addOnlineUser({ userName: this.props.userName });
+    if (userName) {
+      socket.on("connect", () => {
+        socket.emit("board connect", {
+          boardId: id,
+          socketId: socket.id,
+          userName,
+        });
+      });
     }
 
-    console.log(this.props.onlineUsers);
-    // this.props.addOnlineUser()
+    window.addEventListener("beforeunload", this.unloadHandler);
+
+    socket.emit("new board connection", { boardId: id });
+
+    socket.on("fetch users", (usersArray: string[]) => {
+      onlineUsers = usersArray;
+      this.setState(this.state);
+    });
+
+    socket.on(
+      "user connect",
+      (incomingUser: { userName: string; onlineUsers: string[] }) => {
+        onlineUsers = incomingUser.onlineUsers;
+        this.setState(this.state);
+        message.info(`User ${incomingUser.userName} is now seeing this board`);
+      },
+    );
+
+    socket.on(
+      "user disconnect",
+      (incomingUser: { userName: string; onlineUsers: string[] }) => {
+        onlineUsers = incomingUser.onlineUsers;
+        this.setState(this.state);
+        message.info(`User ${incomingUser.userName} has disconnected`);
+      },
+    );
   }
 
   showModal: () => void = () => {
@@ -97,12 +126,15 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
   };
 
   componentWillUnmount(): void {
-    this.props.socket.emit("board disconnect", this.props.query.id);
+    window.addEventListener("beforeunload", this.unloadHandler);
+
+    this.props.socket.emit("board disconnect", {
+      boardId: this.props.query.id,
+      userName: this.props.userName || "",
+    });
   }
 
   render() {
-    console.log(this.props);
-
     const id = this.props.query.id;
 
     const listFooter = (
@@ -140,39 +172,26 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
                   size="large"
                   dataSource={posts}
                   renderItem={(post: PostProps) => (
-                    <Post {...post} key={post.id} />
+                    <Post {...post} key={post.id} author={post.author} />
                   )}
                 />
 
                 <p>
-                  <Icon type="contacts" theme="twoTone" /> Currently logged in
-                  users: {/*{data.board.usersOnline[0].userName}*/}
-                  {(this.props.onlineUsers as Array<any>).map(
-                    user => `${user}, `,
-                  )}
-                  {/*{(data.board.usersOnline as Array<any>).map(*/}
-                  {/*user => `${user.userName}, `,*/}
-                  {/*)}*/}
+                  Users seeing this board:{" "}
+                  {onlineUsers.map((user, idx) => {
+                    const separator =
+                      idx === onlineUsers.length - 1 ? "" : ", ";
+                    return (
+                      <React.Fragment key={user}>
+                        <Icon type="user" /> {`${user}${separator}`}
+                      </React.Fragment>
+                    );
+                  })}
                 </p>
               </>
             );
           }}
         </Query>
-
-        {/*<Mutation*/}
-        {/*mutation={ADD_ONLINE_USER}*/}
-        {/*refetchQueries={[{ query: SINGLE_BOARD_QUERY, variables: { id } }]}*/}
-        {/*>*/}
-        {/*{(addOnlineUser, _) => {*/}
-        {/*if (this.props.userName) {*/}
-        {/*addOnlineUser({*/}
-        {/*variables: { boardId: id, userName: this.props.userName },*/}
-        {/*});*/}
-        {/*}*/}
-
-        {/*return null;*/}
-        {/*}}*/}
-        {/*</Mutation>*/}
 
         <Mutation
           mutation={CREATE_POST_MUTATION}
@@ -240,7 +259,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Board);
+export default connect()(Board);
