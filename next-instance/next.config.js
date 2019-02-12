@@ -55,6 +55,8 @@ module.exports = withPlugins(
         cssModules: true,
       }),
     ],
+    // [{ options: { dist: "build" } }],
+    // [{ env: { FRONTEND_URL: "http://localhost:3000" } }],
   ],
   {
     webpack: (config, options) => {
@@ -111,3 +113,7 @@ module.exports = withPlugins(
     },
   },
 );
+
+module.exports.exportPathMap = () => ({
+  "/": { page: "/" },
+});

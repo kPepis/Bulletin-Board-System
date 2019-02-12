@@ -1,0 +1,10 @@
+FROM node:alpine as builder
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+# And then copy over node_modules, etc from that stage to the smaller base image
+FROM nginx
+COPY --from=builder /app/.next /usr/share/nginx/html

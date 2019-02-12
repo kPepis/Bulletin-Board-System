@@ -10,6 +10,7 @@ import { Socket } from "socket.io";
 const app = express();
 
 const server = require("http").Server(app);
+// const io = require("socket.io")(server, { path: "/ws/socket.io" });
 const io = require("socket.io")(server);
 
 const port = 3000;
@@ -42,12 +43,19 @@ app.use(cookieParser());
 app.use((req: Request, _res: Response, next: NextFunction) => {
   const { token } = req.cookies;
   if (token) {
-    const { userId, userName } = jwt.verify(token, process.env.APP_SECRET!) as {
+    // const { userId, userName } = jwt.verify(token, process.env.APP_SECRET!) as {
+
+    console.log("Token is present");
+    console.log(jwt.decode(token));
+    console.log("header", req.headers.cookie);
+
+    const { userId, userName } = jwt.decode(token) as {
       userId: string;
       userName: string;
     };
 
     // put userId onto the request for future requests to access
+    // req.userId = userId;
     req.userId = userId;
     req.userName = userName;
   }
@@ -77,6 +85,11 @@ io.on("connect", (_socket: Socket) => {
 
   _socket.on("new board connection", (data: { boardId: string }) => {
     const { boardId } = data;
+
+    if (!onlineUsers[boardId]) {
+      onlineUsers[boardId] = new Set();
+    }
+
     _socket.emit("fetch users", Array.from(onlineUsers[boardId]));
   });
 

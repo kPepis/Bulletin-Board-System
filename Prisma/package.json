@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "prisma deploy -e ../.env",
-    "delete": "prisma delete -e ../.env",
-    "reset": "prisma reset -e ../.env"
+    "deploy": "prisma deploy -e ./.env",
+    "delete": "prisma delete -e ./.env",
+    "reset": "prisma reset -e ./.env"
   },
   "keywords": [],
   "author": "",

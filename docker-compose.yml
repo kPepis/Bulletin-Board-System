@@ -1,7 +1,7 @@
 version: "3"
 services:
   next:
-    image: "bbs/next-instance:latest"
+    image: "pepis/bbs-next:latest"
     restart: always
     build:
       context: next-instance
@@ -14,7 +14,8 @@ services:
     env_file:
       - .env
   prisma:
-    image: "prismagraphql/prisma:1.26-beta-2"
+    # image: "prismagraphql/prisma:1.26.4"
+    image: "pepis/bbs-prisma:latest"
     restart: always
     ports:
       - "4466:4466"
@@ -38,7 +39,7 @@ services:
     volumes:
       - "./MongoData:/data/db"
   yoga:
-    image: "bbs/yoga:latest"
+    image: "pepis/bbs-yoga:latest"
     restart: always
     build:
       context: Yoga

@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f kompose.yml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: next
+  name: next
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: next
+    spec:
+      containers:
+      - env:
+        - name: APP_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: APP_SECRET
+              name: next-env
+        - name: COMPOSE_HTTP_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              key: COMPOSE_HTTP_TIMEOUT
+              name: next-env
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              key: FRONTEND_URL
+              name: next-env
+        - name: PRISMA_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_ENDPOINT
+              name: next-env
+        - name: PRISMA_ENDPOINT_CONTAINER
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_ENDPOINT_CONTAINER
+              name: next-env
+        - name: PRISMA_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_SECRET
+              name: next-env
+        - name: YOGA_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: YOGA_ENDPOINT
+              name: next-env
+        image: pepis/bbs-next:latest
+        name: next
+        ports:
+        - containerPort: 3000
+        resources: {}
+      restartPolicy: Always
+status: {}

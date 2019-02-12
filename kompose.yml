@@ -1,0 +1,54 @@
+version: "3"
+services:
+  nginx:
+    image: "pepis/bbs-nginx:latest"
+    restart: always
+    build:
+      context: next-instance
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8080:80"
+    # volumes:
+    # - /app/node_modules
+    # - "./next-instance:/app"
+    env_file:
+      - .env
+  prisma:
+    image: "pepis/bbs-prisma:latest"
+    restart: always
+    ports:
+      - "4466:4466"
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        # uncomment the next line and provide the env var PRISMA_MANAGEMENT_API_SECRET=my-secret to activate cluster security
+        # managementApiSecret: my-secret
+        databases:
+          default:
+            connector: mongo
+            uri: 'mongodb://prisma:prisma@mongo'
+  mongo:
+    image: "mongo:latest"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: prisma
+      MONGO_INITDB_ROOT_PASSWORD: prisma
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./MongoData:/data/db"
+  yoga:
+    image: "pepis/bbs-yoga:latest"
+    restart: always
+    build:
+      context: Yoga
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    # volumes:
+    #   - /app/node_modules
+    #   - "./Yoga:/app"
+    env_file:
+      - .env
+volumes:
+  mongo:

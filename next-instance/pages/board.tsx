@@ -132,6 +132,8 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
       boardId: this.props.query.id,
       userName: this.props.userName || "",
     });
+
+    this.props.socket.close();
   }
 
   render() {

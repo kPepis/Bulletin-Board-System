@@ -4,7 +4,7 @@ COPY package.json .
 RUN npm install
 COPY . .
 
-FROM node:latest
-WORKDIR /app
-COPY --from=base /app .
+# FROM node:latest
+# WORKDIR /app
+# COPY --from=base /app .
 CMD ["npm", "run", "start"]
