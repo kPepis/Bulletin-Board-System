@@ -1,5 +1,6 @@
 import gql from "graphql-tag";
-import { perPage } from "../config";
+
+import { perPage } from "./../config";
 
 export const GET_BOARDS_QUERY = gql`
   query GET_BOARDS_QUERY($skip: Int = 0, $first: Int = ${perPage}) {

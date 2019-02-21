@@ -6973,7 +6973,7 @@ var _pageLoader = _interopRequireDefault(__webpack_require__(/*! ../lib/page-loa
 
 var asset = _interopRequireWildcard(__webpack_require__(/*! ../lib/asset */ "./node_modules/next/dist/lib/asset.js"));
 
-var envConfig = _interopRequireWildcard(__webpack_require__(/*! ../lib/runtime-config */ "./node_modules/next/dist/lib/runtime-config.js"));
+var envConfig = _interopRequireWildcard(__webpack_require__(/*! ../lib/runtime-config */ "./node_modules/next/dist/lib/runtime-config.ts"));
 
 var _errorBoundary = _interopRequireDefault(__webpack_require__(/*! ./error-boundary */ "./node_modules/next/dist/client/error-boundary.js"));
 
@@ -9703,7 +9703,7 @@ function withRouter(ComposedComponent) {
 
 /***/ "./node_modules/next/dist/lib/runtime-config.js":
 /*!******************************************************!*\
-  !*** ./node_modules/next/dist/lib/runtime-config.js ***!
+  !*** ./node_modules/next/dist/lib/runtime-config.ts ***!
   \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -13034,7 +13034,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 // Importing iframe-bundle generated in the pre build step as
-// a text using webpack raw-loader. See webpack.config.js file.
+// a text using webpack raw-loader. See webpack.config.ts file.
 // $FlowFixMe
 
 

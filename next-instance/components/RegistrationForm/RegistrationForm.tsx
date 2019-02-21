@@ -7,6 +7,10 @@ import gql from "graphql-tag";
 import Router from "next/router";
 import React, { Component } from "react";
 import { Mutation } from "react-apollo";
+import jwt from "jsonwebtoken";
+import { Cookies, withCookies } from "react-cookie";
+
+const cookies = new Cookies();
 
 export const SIGN_UP_MUTATION = gql`
   mutation SIGN_UP_MUTATION($userName: String!, $password: String!) {
@@ -99,6 +103,20 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
                         // Call the mutation function (CreateUser)
                         // todo show in UI if user already exists
                         const user = await signUp();
+
+                        const token = jwt.sign(
+                          {
+                            userName: form.getFieldValue("userName"),
+                          },
+                          "LALALALA",
+                        );
+
+                        localStorage.setItem(
+                          "token",
+                          JSON.stringify({ token }),
+                        );
+
+                        cookies.set("token", token, { path: "/" });
 
                         // Redirect them to the boards page
                         await Router.push("/boards");
@@ -219,4 +237,4 @@ class NormalLoginForm extends Component<FormComponentProps, FormState> {
 
 const WrappedNormalLoginForm = Form.create({})(NormalLoginForm);
 
-export default WrappedNormalLoginForm;
+export default withCookies(WrappedNormalLoginForm);

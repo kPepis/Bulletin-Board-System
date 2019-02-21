@@ -1,14 +1,19 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { forwardTo } from "prisma-binding";
+import Cookies from "universal-cookie";
 
 import { GraphQL } from "../../types/graphql-interfaces";
 
+const cookies = new Cookies();
+
 const Mutation: Record<string, GraphQL.Mutation> = {
   async createUser(parent, args, ctx, info) {
-    return await ctx.db.createUser({
+    const result = await ctx.db.createUser({
       ...args,
     });
+
+    console.log(result);
   },
 
   async signUp(
@@ -82,12 +87,40 @@ const Mutation: Record<string, GraphQL.Mutation> = {
     return user;
   },
 
-  async createBoard(parent, args, ctx, info) {
-    const isUserLoggedIn = !!ctx.request.userId;
+  async signOut(parent, args, ctx, info) {
+    console.log(ctx.request.cookies);
 
-    if (!isUserLoggedIn) {
-      throw new Error("User not logged in");
+    ctx.request.clearCookie("token", { path: "/" });
+    ctx.request.clearCookie("userId", { path: "/" });
+    ctx.request.clearCookie("userName", { path: "/" });
+
+    // const user = await ctx.db.user({
+    //   id: userId,
+    // });
+
+    ctx.response.clearCookie("token", { path: "/" });
+    ctx.response.clearCookie("userId", { path: "/" });
+    ctx.response.clearCookie("userName", { path: "/" });
+    ctx.response.redirect("/");
+
+    // return null;
+  },
+
+  async createBoard(parent, args, ctx, info) {
+    const token = ctx.request.token;
+
+    if (token) {
+      const { userId, userName } = jwt.decode(token) as {
+        userId: string;
+        userName: string;
+      };
     }
+
+    const isUserLoggedIn = !!token;
+
+    // if (!isUserLoggedIn) {
+    //   throw new Error("User not logged in");
+    // }
 
     return await ctx.db.createBoard({
       name: args.name,
@@ -99,11 +132,11 @@ const Mutation: Record<string, GraphQL.Mutation> = {
   async createPost(parent, args, ctx, info) {
     const isUserLoggedIn = !!ctx.request.userId;
 
-    if (!isUserLoggedIn) {
-      throw new Error("User not logged in");
-    }
+    // if (!isUserLoggedIn) {
+    //   throw new Error("User not logged in");
+    // }
 
-    const { title, content, boardId, image } = args;
+    const { title, content, boardId, image, userName } = args;
     return await ctx.db.createPost({
       title,
       content,
@@ -113,7 +146,7 @@ const Mutation: Record<string, GraphQL.Mutation> = {
       image,
       author: {
         connect: {
-          id: ctx.request.userId,
+          userName,
         },
       },
     });

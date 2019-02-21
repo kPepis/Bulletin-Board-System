@@ -1,8 +1,8 @@
-import { put, takeLatest } from "redux-saga/effects";
 import es6promise from "es6-promise";
 import fetch from "isomorphic-unfetch";
+import { put, takeLatest } from "redux-saga/effects";
 
-import { actionTypes, loadDataSucess, loadDataError } from "./actions";
+import { actionTypes, loadDataError, loadDataSucess } from "./actions";
 
 es6promise.polyfill();
 

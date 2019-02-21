@@ -3,7 +3,6 @@ import { readFileSync } from "fs";
 import { buildSchema, execute, subscribe } from "graphql";
 import jwt from "jsonwebtoken";
 import { SubscriptionServer } from "subscriptions-transport-ws";
-import bodyParser from "body-parser";
 
 import createServer from "./createServer";
 
@@ -31,28 +30,43 @@ server.express.use((req, res, next) => {
   next();
 });
 
+server.express.use((req, res, next) => {
+  // res.header("Access-Control-Allow-Origin", "http://localhost");
+  const origin = req.get("origin");
+  res.header("Access-Control-Allow-Origin", origin);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With, Accept, Origin",
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if ("OPTIONS" === req.method) {
+    res.send(200);
+  } else {
+    next();
+  }
+
+  // res.header(
+  //   "Access-Control-Allow-Headers",
+  //   "Origin, X-Requested-With, Content-Type, Accept",
+  // );
+  // next();
+});
+
+server.express.enable("trust proxy");
+
 server.start(
   {
-    cors: {
-      credentials: true,
-      origin: process.env.FRONTEND_URL,
-    },
+    endpoint: "/",
+    // cors: {
+    //   credentials: true,
+    //   origin: ["*"],
+    //   //   // origin: false,
+    // },
     port: 4000,
   },
-  options => {
-    console.log(`Server running on ${process.env.FRONTEND_URL}`);
-  },
-);
-
-SubscriptionServer.create(
-  {
-    schema,
-    execute,
-    subscribe,
-    onOperationComplete: () => "An operation just completed.",
-  },
-  {
-    server: server.express,
-    path: "/",
+  () => {
+    console.log(`Server running on ${process.env.YOGA_ENDPOINT}`);
   },
 );

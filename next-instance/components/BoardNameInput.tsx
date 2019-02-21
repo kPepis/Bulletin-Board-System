@@ -1,5 +1,5 @@
+import { Form, Icon, Input } from "antd";
 import React from "react";
-import { Icon, Input, Form } from "antd";
 
 export function BoardFormInput(props: {
   formItemLayout: {

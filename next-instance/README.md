@@ -33,7 +33,7 @@ After creating an app, it should look something like:
 ├── components
 │   ├── head.js
 │   └── nav.js
-├── next.config.js
+├── next.config.ts
 ├── node_modules
 │   ├── [...]
 ├── package.json

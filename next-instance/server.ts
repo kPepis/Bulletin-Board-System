@@ -1,32 +1,22 @@
+import * as cookieParser from "cookie-parser";
+import { NextFunction, Request, Response } from "express";
+// import * as express from "express";
 const express = require("express");
-const next = require("next");
-const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
+// import { IncomingMessage, ServerResponse } from "http";
+import * as jwt from "jsonwebtoken";
+import * as next from "next";
 
-import { NextFunction } from "express-serve-static-core";
+import bodyParser = require("body-parser");
 import { IncomingMessage, ServerResponse } from "http";
-import { Socket } from "socket.io";
 
 const app = express();
 
 const server = require("http").Server(app);
-// const io = require("socket.io")(server, { path: "/ws/socket.io" });
-const io = require("socket.io")(server);
 
 const port = 3000;
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
-
-const onlineUsers: {
-  [index: string]: Set<string>;
-} = {};
-
-interface boardConnectEvent {
-  boardId: string;
-  socketId: string;
-  userName: string;
-}
 
 declare global {
   interface Request {
@@ -38,83 +28,41 @@ declare global {
   }
 }
 
-app.use(cookieParser());
-
-app.use((req: Request, _res: Response, next: NextFunction) => {
-  const { token } = req.cookies;
-  if (token) {
-    // const { userId, userName } = jwt.verify(token, process.env.APP_SECRET!) as {
-
-    console.log("Token is present");
-    console.log(jwt.decode(token));
-    console.log("header", req.headers.cookie);
-
-    const { userId, userName } = jwt.decode(token) as {
-      userId: string;
-      userName: string;
-    };
-
-    // put userId onto the request for future requests to access
-    // req.userId = userId;
-    req.userId = userId;
-    req.userName = userName;
-  }
-  next();
-});
-
-io.on("connect", (_socket: Socket) => {
-  _socket.on(
-    "board disconnect",
-    (data: { userName: string; boardId: string }) => {
-      const { boardId, userName } = data;
-      console.log(`A user has left board ${boardId}`);
-      onlineUsers[boardId].delete(userName);
-
-      _socket.to(boardId).broadcast.emit("user disconnect", {
-        userName,
-        onlineUsers: Array.from(onlineUsers[boardId]),
-      });
-
-      console.log(onlineUsers[boardId]);
-    },
-  );
-
-  _socket.on("disconnect", () => {
-    console.log("User has disconnected");
-  });
-
-  _socket.on("new board connection", (data: { boardId: string }) => {
-    const { boardId } = data;
-
-    if (!onlineUsers[boardId]) {
-      onlineUsers[boardId] = new Set();
-    }
-
-    _socket.emit("fetch users", Array.from(onlineUsers[boardId]));
-  });
-
-  _socket.on("board connect", (data: boardConnectEvent) => {
-    const { boardId, userName } = data;
-    _socket.join(boardId);
-
-    // create a new set for a board if it doesn't exist
-    if (!onlineUsers[boardId]) {
-      onlineUsers[boardId] = new Set();
-    }
-    // add online user to boardId set structure
-    onlineUsers[boardId].add(userName);
-
-    _socket.to(boardId).broadcast.emit("user connect", {
-      userName,
-      onlineUsers: Array.from(onlineUsers[boardId]),
-    });
-
-    console.log(`Socket ${data.socketId} has entered board ${boardId}.`);
-  });
-});
-
 nextApp.prepare().then(() => {
+  app.use(cookieParser());
+
+  app.use(bodyParser.json());
+
+  // app.use((req: Request, res: Response, next: NextFunction) => {});
+
   app.get("*", (req: IncomingMessage, res: ServerResponse) => {
+    const { token } = req.cookies;
+    console.log(token);
+    if (token) {
+      const { userId, userName } = jwt.verify(
+        token,
+        process.env.APP_SECRET!,
+      ) as {
+        userId: string;
+        userName: string;
+      };
+
+      res.cookie("userId", userId);
+      res.cookie("userName", userName);
+    }
+    // next();
+
+    return nextHandler(req, res);
+  });
+
+  app.get("/logout", (req: IncomingMessage, res: ServerResponse) => {
+    // @ts-ignore
+    res.clearCookie("token", { path: "/" });
+    // @ts-ignore
+    res.clearCookie("userId", { path: "/" });
+    // @ts-ignore
+    res.clearCookie("userName", { path: "/" });
+
     return nextHandler(req, res);
   });
 

@@ -1,6 +1,7 @@
 import { Action } from "redux";
-import { IAnnouncement } from "./state";
+
 import * as announcementActions from "./actions";
+import { IAnnouncement } from "./state";
 
 const initialState: IAnnouncement = {
   message: "No announcements",

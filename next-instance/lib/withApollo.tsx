@@ -1,7 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { ApolloProvider, getDataFromTree } from "react-apollo";
 import Head from "next/head";
+import PropTypes from "prop-types";
+import React from "react";
+import { ApolloProvider, getDataFromTree } from "react-apollo";
+
 import initApollo from "./initApollo";
 
 // Gets the display name of a JSX component for dev tools

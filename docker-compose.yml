@@ -14,7 +14,6 @@ services:
     env_file:
       - .env
   prisma:
-    # image: "prismagraphql/prisma:1.26.4"
     image: "pepis/bbs-prisma:latest"
     restart: always
     ports:
@@ -49,6 +48,27 @@ services:
     volumes:
       - /app/node_modules
       - "./Yoga:/app"
+    env_file:
+      - .env
+  nginx:
+    image: "pepis/bbs-nginx:latest"
+    restart: always
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "3001:3001"
+      - "443:443"
+  socket:
+    image: "pepis/bbs-socket:latest"
+    restart: always
+    build: websocket-server
+    # ports:
+    #   - "3001:3001"
+    volumes:
+      - /app/node_modules
+      - "./websocket-server:/app"
     env_file:
       - .env
 volumes:

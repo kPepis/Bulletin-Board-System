@@ -1,22 +1,29 @@
 import { Affix, Button, Icon, List, message, Modal } from "antd";
 import { FormComponentProps } from "antd/lib/form";
+import WS from "isomorphic-ws";
 import { NextContext } from "next";
 import Head from "next/head";
+import nookies from "nookies";
 import React, { Component } from "react";
 import { Mutation, Query } from "react-apollo";
 import CanvasDraw, { DrawingCanvas } from "react-canvas-draw";
+import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
 import { PacmanLoader } from "react-spinners";
 import { bindActionCreators } from "redux";
-import { addOnlineUser } from "../actions";
+import jwt from "jsonwebtoken";
 
+import { addOnlineUser } from "../actions";
+import { NookiesProps } from "../components/BoardsForm";
 import Post, { PostProps } from "../components/Post";
 import PostForm from "../components/PostForm";
 import { CREATE_POST_MUTATION } from "../graphql/mutations";
 import { SINGLE_BOARD_QUERY } from "../graphql/queries";
 
+const cookies = new Cookies();
+
 interface SingleBoardProps {
-  socket: SocketIOClient.Socket;
+  socket: WS;
   query: {
     id: string;
   };
@@ -27,6 +34,7 @@ interface SingleBoardState {
   modalVisible: boolean;
   modalLoading: boolean;
   formValid: boolean;
+  userName?: string;
 }
 
 interface FormRef {
@@ -44,39 +52,80 @@ interface PostFormFields {
 
 let onlineUsers: Array<string> = [];
 
-class Board extends Component<SingleBoardProps, SingleBoardState> {
+class Board extends Component<
+  SingleBoardProps & NookiesProps,
+  SingleBoardState
+> {
   static async getInitialProps(ctx: NextContext) {
-    const { query, req } = ctx;
+    const { query } = ctx;
+    const cookies = nookies.get(ctx);
+    // const kookie = ctx.req.headers.cookie;
 
-    return { query, userName: req.userName };
+    return { query, cookies };
   }
 
-  state: SingleBoardState = {
-    modalVisible: false,
-    modalLoading: false,
-    formValid: false,
-  };
+  // state: SingleBoardState = {
+  //   modalVisible: false,
+  //   modalLoading: false,
+  //   formValid: false,
+  // };
+
+  constructor(props: SingleBoardProps & NookiesProps) {
+    super(props);
+
+    this.state = {
+      modalVisible: false,
+      modalLoading: false,
+      formValid: false,
+    };
+  }
 
   unloadHandler = () => {
+    const token = this.props.cookies.token;
+    const { userName } = token
+      ? (jwt.decode(token) as {
+          userId: string;
+          userName: string;
+        })
+      : { userName: null };
+
     this.props.socket.emit("board disconnect", {
       boardId: this.props.query.id,
-      userName: this.props.userName || "",
+      userName,
     });
   };
 
   componentDidMount(): void {
     const socket = this.props.socket;
     const id = this.props.query.id;
-    const userName = this.props.userName;
+    // const token = cookies.get("token");
+    const token = this.props.cookies.token;
+    const { userName } = token
+      ? (jwt.decode(token) as {
+          userId: string;
+          userName: string;
+        })
+      : { userName: null };
+
+    // if (token) {
+    //   { userName } = jwt.decode(token) as {
+    //     userId: string;
+    //     userName: string;
+    //   };
+    // }
+
+    // const userName = this.props.cookies.userName
+    //   ? this.props.cookies.userName
+    //   // @ts-ignore
+    //   : this.props.kookie;
 
     if (userName) {
-      socket.on("connect", () => {
-        socket.emit("board connect", {
-          boardId: id,
-          socketId: socket.id,
-          userName,
-        });
+      // socket.on("connect", () => {
+      socket.emit("board connect", {
+        boardId: id,
+        userName,
       });
+      // });
     }
 
     window.addEventListener("beforeunload", this.unloadHandler);
@@ -217,6 +266,14 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
                 const form = this.formRef.props.form;
                 form.validateFields(async (err, values: PostFormFields) => {
                   if (!err) {
+                    const token = this.props.cookies.token;
+                    const { userName, userId } = token
+                      ? (jwt.decode(token) as {
+                          userId: string;
+                          userName: string;
+                        })
+                      : { userName: null, userId: null };
+
                     const image = this.loadableCanvas.getSaveData();
                     await createPost({
                       variables: {
@@ -224,6 +281,7 @@ class Board extends Component<SingleBoardProps, SingleBoardState> {
                         content: values.postContent,
                         boardId: id,
                         image,
+                        userName,
                       },
                     });
                     this.setState({
@@ -261,4 +319,5 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
+// export default connect()(withCookies(Board));
 export default connect()(Board);

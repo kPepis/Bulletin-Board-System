@@ -361,7 +361,7 @@ var WrappedNormalLoginForm = antd_lib_form__WEBPACK_IMPORTED_MODULE_11___default
 
 /***/ "./config.js":
 /*!*******************!*\
-  !*** ./config.js ***!
+  !*** ./config.ts ***!
   \*******************/
 /*! exports provided: endpoint, perPage */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -456,7 +456,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BOARD_ONLINE_USERS_QUERY", function() { return BOARD_ONLINE_USERS_QUERY; });
 /* harmony import */ var graphql_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! graphql-tag */ "./node_modules/graphql-tag/src/index.js");
 /* harmony import */ var graphql_tag__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(graphql_tag__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./config.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./config.ts");
 function _templateObject4() {
   var data = _taggedTemplateLiteral(["\n  query BOARD_ONLINE_USERS_QUERY($id: ID!) {\n    board(where: { id: $id }) {\n      usersOnline {\n        userName\n      }\n    }\n  }\n"]);
 

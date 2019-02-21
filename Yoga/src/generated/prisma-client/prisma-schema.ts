@@ -91,8 +91,6 @@ input BoardSubscriptionWhereInput {
   updatedFields_contains_some: [String!]
   node: BoardWhereInput
   AND: [BoardSubscriptionWhereInput!]
-  OR: [BoardSubscriptionWhereInput!]
-  NOT: [BoardSubscriptionWhereInput!]
 }
 
 input BoardUpdateInput {
@@ -170,6 +168,9 @@ input BoardWhereInput {
   description_not_starts_with: String
   description_ends_with: String
   description_not_ends_with: String
+  posts_some: PostWhereInput
+  usersOnline_some: UserWhereInput
+  createdBy: UserWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -187,8 +188,6 @@ input BoardWhereInput {
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
   AND: [BoardWhereInput!]
-  OR: [BoardWhereInput!]
-  NOT: [BoardWhereInput!]
 }
 
 input BoardWhereUniqueInput {
@@ -418,8 +417,6 @@ input PostSubscriptionWhereInput {
   updatedFields_contains_some: [String!]
   node: PostWhereInput
   AND: [PostSubscriptionWhereInput!]
-  OR: [PostSubscriptionWhereInput!]
-  NOT: [PostSubscriptionWhereInput!]
 }
 
 input PostUpdateInput {
@@ -446,6 +443,7 @@ input PostUpdateManyWithoutAuthorInput {
   create: [PostCreateWithoutAuthorInput!]
   delete: [PostWhereUniqueInput!]
   connect: [PostWhereUniqueInput!]
+  set: [PostWhereUniqueInput!]
   disconnect: [PostWhereUniqueInput!]
   update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
   upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
@@ -457,6 +455,7 @@ input PostUpdateManyWithoutBoardInput {
   create: [PostCreateWithoutBoardInput!]
   delete: [PostWhereUniqueInput!]
   connect: [PostWhereUniqueInput!]
+  set: [PostWhereUniqueInput!]
   disconnect: [PostWhereUniqueInput!]
   update: [PostUpdateWithWhereUniqueWithoutBoardInput!]
   upsert: [PostUpsertWithWhereUniqueWithoutBoardInput!]
@@ -520,6 +519,7 @@ input PostWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  author: UserWhereInput
   title: String
   title_not: String
   title_in: [String!]
@@ -562,6 +562,7 @@ input PostWhereInput {
   image_not_starts_with: String
   image_ends_with: String
   image_not_ends_with: String
+  board: BoardWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -579,8 +580,6 @@ input PostWhereInput {
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
   AND: [PostWhereInput!]
-  OR: [PostWhereInput!]
-  NOT: [PostWhereInput!]
 }
 
 input PostWhereUniqueInput {
@@ -735,8 +734,6 @@ input UserSubscriptionWhereInput {
   updatedFields_contains_some: [String!]
   node: UserWhereInput
   AND: [UserSubscriptionWhereInput!]
-  OR: [UserSubscriptionWhereInput!]
-  NOT: [UserSubscriptionWhereInput!]
 }
 
 input UserUpdateDataInput {
@@ -765,6 +762,7 @@ input UserUpdateManyInput {
   upsert: [UserUpsertWithWhereUniqueNestedInput!]
   delete: [UserWhereUniqueInput!]
   connect: [UserWhereUniqueInput!]
+  set: [UserWhereUniqueInput!]
   disconnect: [UserWhereUniqueInput!]
   deleteMany: [UserScalarWhereInput!]
   updateMany: [UserUpdateManyWithWhereNestedInput!]
@@ -869,9 +867,8 @@ input UserWhereInput {
   password_not_starts_with: String
   password_ends_with: String
   password_not_ends_with: String
+  posts_some: PostWhereInput
   AND: [UserWhereInput!]
-  OR: [UserWhereInput!]
-  NOT: [UserWhereInput!]
 }
 
 input UserWhereUniqueInput {

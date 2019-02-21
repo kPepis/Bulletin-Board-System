@@ -1,4 +1,5 @@
 import { Action } from "redux";
+
 import { actionTypes } from "./actions";
 
 export const initialState = {

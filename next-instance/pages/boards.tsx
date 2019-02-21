@@ -1,14 +1,18 @@
 import { Card, Pagination } from "antd";
+import * as jwt from "jsonwebtoken";
 import { NextContext } from "next";
 import Router from "next/router";
+import nookies from "nookies";
 import React, { Component } from "react";
 import { Query } from "react-apollo";
+import io from "socket.io-client";
 
 import * as PrismaTypes from "../../Prisma/generated/prisma-client/";
 import Board, { BoardProps } from "../components/Board";
-import BoardsForm from "../components/BoardsForm";
+import BoardsForm, { NookiesProps } from "../components/BoardsForm";
 import { perPage } from "../config";
 import { GET_BOARDS_QUERY, PAGINATION_QUERY } from "../graphql/queries";
+import { GlobalAppState } from "./_app";
 
 interface PaginationData {
   boardsConnection: {
@@ -34,11 +38,33 @@ interface BoardsQuery {
   last?: PrismaTypes.Int;
 }
 
-export default class Boards extends Component<BoardsProps> {
+class Boards extends Component<BoardsProps & NookiesProps, GlobalAppState> {
   static async getInitialProps(ctx: NextContext) {
-    const { query, req } = ctx;
+    const cookies = nookies.get(ctx);
+    const { query } = ctx;
+    // const kookie = ctx.req.headers.cookie;
     const page: number = query.page ? parseInt(query.page as string) : 1;
-    return { page, userId: req.userId, userName: req.userName };
+    return { page, cookies };
+  }
+
+  componentDidMount(): void {
+    const token = this.props.cookies.token;
+
+    // @ts-ignore
+    // console.log("test", this.props.kookie);
+
+    console.log(token);
+
+    if (token) {
+      const { userId, userName } = jwt.decode(token) as {
+        userId: string;
+        userName: string;
+      };
+
+      console.log(userName, userId);
+
+      this.setState({ userId, userName, socket: io() });
+    }
   }
 
   onPageChange = async (page: number) => {
@@ -105,13 +131,11 @@ export default class Boards extends Component<BoardsProps> {
           }}
         </Query>
 
-        {this.props.userName && (
-          <BoardsForm
-            userName={this.props.userName!}
-            userId={this.props.userId!}
-          />
-        )}
+        <BoardsForm cookies={this.props.cookies} />
+        {/*{this.state.userName && this.state.userId && <BoardsForm />}*/}
       </>
     );
   }
 }
+
+export default Boards;

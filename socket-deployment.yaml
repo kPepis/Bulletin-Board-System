@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f kompose.yml convert
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: socket
+  name: socket
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: socket
+    spec:
+      containers:
+      - env:
+        - name: APP_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: APP_SECRET
+              name: app-env
+        - name: COMPOSE_HTTP_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              key: COMPOSE_HTTP_TIMEOUT
+              name: app-env
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              key: FRONTEND_URL
+              name: app-env
+        - name: PRISMA_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_ENDPOINT
+              name: app-env
+        - name: PRISMA_ENDPOINT_CONTAINER
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_ENDPOINT_CONTAINER
+              name: app-env
+        - name: PRISMA_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: PRISMA_SECRET
+              name: app-env
+        - name: YOGA_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: YOGA_ENDPOINT
+              name: app-env
+        image: pepis/bbs-socket:latest
+        name: socket
+        ports:
+        - containerPort: 3001
+        resources: {}
+      restartPolicy: Always
+status: {}

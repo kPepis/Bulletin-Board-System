@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f kompose.yml
+    kompose.cmd: kompose -f kompose.yml convert
     kompose.version: 1.17.0 (a74acad)
   creationTimestamp: null
   labels:
@@ -23,37 +23,37 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: APP_SECRET
-              name: yoga-env
+              name: app-env
         - name: COMPOSE_HTTP_TIMEOUT
           valueFrom:
             configMapKeyRef:
               key: COMPOSE_HTTP_TIMEOUT
-              name: yoga-env
+              name: app-env
         - name: FRONTEND_URL
           valueFrom:
             configMapKeyRef:
               key: FRONTEND_URL
-              name: yoga-env
+              name: app-env
         - name: PRISMA_ENDPOINT
           valueFrom:
             configMapKeyRef:
               key: PRISMA_ENDPOINT
-              name: yoga-env
+              name: app-env
         - name: PRISMA_ENDPOINT_CONTAINER
           valueFrom:
             configMapKeyRef:
               key: PRISMA_ENDPOINT_CONTAINER
-              name: yoga-env
+              name: app-env
         - name: PRISMA_SECRET
           valueFrom:
             configMapKeyRef:
               key: PRISMA_SECRET
-              name: yoga-env
+              name: app-env
         - name: YOGA_ENDPOINT
           valueFrom:
             configMapKeyRef:
               key: YOGA_ENDPOINT
-              name: yoga-env
+              name: app-env
         image: pepis/bbs-yoga:latest
         name: yoga
         ports:

@@ -1,28 +1,55 @@
-import { Button, Col, Form, Icon, Input, Row } from "antd";
+import { Button, Col, Form, Icon, Input, message, Row } from "antd";
 import { ColProps } from "antd/lib/col";
 import { FormComponentProps } from "antd/lib/form";
+import * as jwt from "jsonwebtoken";
 import { NextContext } from "next";
+import nookies from "nookies";
 import React, { Component } from "react";
 import { Mutation, MutationFn } from "react-apollo";
+import io from "socket.io-client";
 
 import { CREATE_BOARD_MUTATION } from "../graphql/mutations";
 import { GET_BOARDS_QUERY } from "../graphql/queries";
+import { GlobalAppState } from "../pages/_app";
 
 interface NewBoardFormValues {
   boardName: string;
   boardDescription: string;
 }
 
-interface BoardsFormProps {
-  userId: string;
-  userName: string;
+export interface NookiesProps {
+  cookies: { [p: string]: string };
 }
 
-class NormalLoginForm extends Component<FormComponentProps & BoardsFormProps> {
+class NormalLoginForm extends Component<
+  FormComponentProps & NookiesProps,
+  GlobalAppState
+> {
   static async getInitialProps(ctx: NextContext) {
-    const { query, req } = ctx;
+    const { query } = ctx;
+    const cookies = nookies.get(ctx);
     const page: number = query.page ? parseInt(query.page as string) : 1;
-    return { page, userId: req.userId, userName: req.userName };
+    return { page, cookies };
+  }
+
+  componentDidMount(): void {
+    let token = null;
+
+    if (this.props.cookies.token) {
+      token = this.props.cookies.token;
+    }
+    console.log(token);
+
+    if (token) {
+      const { userId, userName } = jwt.decode(token) as {
+        userId: string;
+        userName: string;
+      };
+
+      console.log(userName, userId);
+
+      this.setState({ userId, userName, socket: io() });
+    }
   }
 
   render() {
@@ -66,16 +93,24 @@ class NormalLoginForm extends Component<FormComponentProps & BoardsFormProps> {
                 <Form
                   onSubmit={e => {
                     e.preventDefault();
+
+                    if (!this.state.userName) {
+                      return message.error(
+                        "You must be logged in to create a new board",
+                      );
+                    }
+
                     this.props.form.validateFields(
-                      async (err, values: NewBoardFormValues) => {
+                      async (err: any, values: NewBoardFormValues) => {
                         if (!err) {
                           const res = await createBoard({
                             variables: {
                               name: values.boardName,
                               description: values.boardDescription,
-                              userName: this.props.userName,
+                              userName: this.state.userName,
                             },
                           });
+
                           // if board creation was successful, clear form
                           if (res) {
                             form.resetFields();

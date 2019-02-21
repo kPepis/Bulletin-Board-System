@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f kompose.yml
+    kompose.cmd: kompose -f kompose.yml convert
     kompose.version: 1.17.0 (a74acad)
   creationTimestamp: null
   labels:

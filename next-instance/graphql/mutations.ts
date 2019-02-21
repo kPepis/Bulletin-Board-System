@@ -20,12 +20,14 @@ export const CREATE_POST_MUTATION = gql`
     $content: String!
     $boardId: String!
     $image: String!
+    $userName: String!
   ) {
     createPost(
       title: $title
       content: $content
       boardId: $boardId
       image: $image
+      userName: $userName
     ) {
       title
       content
